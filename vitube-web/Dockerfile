@@ -1,0 +1,40 @@
+# ---------- build ----------
+FROM node:22-alpine AS builder
+WORKDIR /app
+
+COPY package.json package-lock.json* ./
+RUN npm ci --no-audit --no-fund || npm install --no-audit --no-fund
+
+COPY . .
+RUN npm run build
+
+# ---------- runtime ----------
+FROM node:22-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+
+# yt-dlp cần python; ffmpeg để dành cho các tác vụ remux sau này
+RUN apk add --no-cache python3 ffmpeg ca-certificates \
+    && ln -sf /usr/bin/python3 /usr/bin/python
+
+# Bản zipapp chạy bằng python3 — KHÔNG dùng `yt-dlp_linux`: đó là bản đóng gói cho
+# glibc, không chạy trên Alpine (musl), và chỉ có cho x86_64 nên hỏng luôn trên máy chủ
+# ARM (Oracle Cloud miễn phí, Raspberry Pi…). Zipapp chạy được mọi nơi có python3.
+ADD https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp /usr/local/bin/yt-dlp
+RUN chmod +x /usr/local/bin/yt-dlp && yt-dlp --version
+
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/public ./public
+
+ENV YTDLP_PATH=/usr/local/bin/yt-dlp
+ENV PORT=3000
+# node:sqlite có sẵn trong Node 22.5+, không cần cài gói nào
+ENV DB_DRIVER=auto
+
+# Dữ liệu tài khoản nằm ngoài image để không mất khi build lại
+VOLUME ["/app/data"]
+EXPOSE 3000
+
+CMD ["npm", "start"]
