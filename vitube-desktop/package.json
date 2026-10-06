@@ -1,0 +1,102 @@
+{
+  "name": "vitube-desktop",
+  "version": "0.1.0",
+  "description": "vitube — xem video không quảng cáo",
+  "main": "main.js",
+  "author": "vitube",
+  "homepage": "https://localhost",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "prepare:web": "node scripts/prepare-web.mjs",
+    "dev": "node scripts/dev.mjs",
+    "start": "npm run prepare:web && electron .",
+    "dist": "npm run prepare:web && electron-builder",
+    "dist:win": "npm run prepare:web && electron-builder --win",
+    "dist:mac": "npm run prepare:web && electron-builder --mac",
+    "dist:linux": "npm run prepare:web && electron-builder --linux",
+    "icon": "node scripts/make-icon.mjs",
+    "dev:shell-only": "cross-env VITUBE_DEV_URL=http://localhost:3000 electron ."
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "vn.vitube.desktop",
+    "productName": "vitube",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "assets/**",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "resources/server",
+        "to": "server"
+      },
+      {
+        "from": "resources/bin",
+        "to": "bin"
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "category": "public.app-category.entertainment"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "icon": "build/icons",
+      "category": "AudioVideo",
+      "synopsis": "Xem video khong quang cao",
+      "description": "vitube - xem video khong quang cao, tu chay may chu tren may cua ban.",
+      "maintainer": "vitube <vitube@localhost>",
+      "desktop": {
+        "entry": {
+          "Name": "vitube",
+          "Comment": "Xem video khong quang cao",
+          "Categories": "AudioVideo;Video;Player;Network;",
+          "Keywords": "video;youtube;player;",
+          "StartupWMClass": "vitube-desktop"
+        }
+      }
+    },
+    "deb": {
+      "depends": [
+        "libgtk-3-0",
+        "libnotify4",
+        "libnss3",
+        "libxss1",
+        "libxtst6",
+        "xdg-utils",
+        "libatspi2.0-0",
+        "libsecret-1-0"
+      ]
+    },
+    "appImage": {
+      "artifactName": "vitube-${version}-${arch}.AppImage"
+    }
+  }
+}

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>vitube — mất kết nối</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; font-family: Roboto, Arial, system-ui, sans-serif;
+         background: #faf7f0; color: #2a2521; text-align: center; padding: 24px; box-sizing: border-box; }
+  @media (prefers-color-scheme: dark) { body { background: #1c1917; color: #f1ece4; } }
+  img { width: 72px; height: 72px; }
+  h1 { font-size: 18px; margin: 16px 0 8px; }
+  p { font-size: 14px; opacity: .75; max-width: 320px; margin: 0 auto 20px; line-height: 1.5; }
+  button { font: inherit; font-size: 14px; border: 0; border-radius: 999px; padding: 10px 20px; background: #a93a2e; color: #faf7f0; }
+</style>
+</head>
+<body>
+  <main>
+    <img src="/icons/icon-192.png" alt="">
+    <h1>Không kết nối được tới vitube</h1>
+    <p>Điện thoại đang mất mạng, hoặc máy chủ vitube đang tắt. Kiểm tra lại rồi thử lần nữa.</p>
+    <button onclick="location.reload()">Thử lại</button>
+  </main>
+</body>
+</html>

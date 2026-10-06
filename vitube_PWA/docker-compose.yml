@@ -1,0 +1,42 @@
+# Chạy vitube 24/7 trên một máy chủ — VPS, Oracle Cloud miễn phí, hay máy tính cũ ở nhà.
+#
+#   cd vitube_PWA
+#   cp .env.example .env              # sửa vài dòng trong đó
+#   docker compose up -d --build
+#
+# Có HTTPS bằng một trong hai cách (xem README, mục Host):
+#   - Tailscale:  chạy ./https/tailscale.sh --public trên chính máy chủ này
+#   - Cloudflare: điền TUNNEL_TOKEN trong .env rồi thêm  --profile cloudflare  vào lệnh trên
+#
+# Mã nguồn lấy thẳng từ ../vitube-web — sửa giao diện ở đó rồi `docker compose up -d --build`.
+
+services:
+  vitube:
+    build: ../vitube-web
+    environment:
+      YT_LANG: vi
+      YT_REGION: VN
+      VITUBE_PUBLIC_URL: ${VITUBE_PUBLIC_URL:-}
+      YTDLP_ARGS: ${YTDLP_ARGS:-}
+      YTDLP_COOKIES_FILE: ${YTDLP_COOKIES_FILE:-}
+      TWA_SHA256: ${TWA_SHA256:-}
+      PWA_SIGN_CERT: ${PWA_SIGN_CERT:-}
+      PWA_SIGN_KEY: ${PWA_SIGN_KEY:-}
+    ports:
+      # chỉ mở cho chính máy chủ — ra internet phải đi qua đường hầm HTTPS
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - ./data:/app/data          # tài khoản, lịch sử — nhớ sao lưu
+      - ./cookies:/cookies:ro     # cookie YouTube nếu máy chủ bị hỏi "not a bot"
+    restart: unless-stopped
+
+  # Đường hầm Cloudflare có tên (địa chỉ cố định trên tên miền của bạn).
+  # Chỉ chạy khi thêm --profile cloudflare.
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    profiles: ["cloudflare"]
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:-}
+    depends_on: [vitube]
+    restart: unless-stopped

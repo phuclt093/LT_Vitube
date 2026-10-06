@@ -1,0 +1,505 @@
+import { execFile } from 'node:child_process';
+import { existsSync } from 'node:fs';
+import path from 'node:path';
+import { promisify } from 'node:util';
+import { extractViaWorker, workerAvailable } from './ytdlp-worker';
+import { biliUrlFromId, isBiliId } from './bili';
+import type { PipedFormat, PipedResult } from './piped';
+
+const run = promisify(execFile);
+
+/**
+ * yt-dlp làm tầng trích xuất chính.
+ *
+ * Lý do: từ khi YouTube bật SABR, endpoint /player không còn trả URL trực tiếp
+ * cho bất kỳ client InnerTube nào, và các instance Piped/Invidious công cộng
+ * cũng gãy theo. yt-dlp là extractor được cập nhật liên tục và xử lý được
+ * PoToken / SABR, nên đặt lên đầu chuỗi.
+ */
+
+const num = (v: any): number | undefined => {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : undefined;
+};
+
+function cleanCodec(c?: string): string {
+  if (!c || c === 'none') return '';
+  return c.split('.').slice(0, 4).join('.');
+}
+
+/**
+ * Header nào của yt-dlp thì đáng giữ lại.
+ *
+ * Danh sách trắng, không bê nguyên `http_headers`: chỉ những header thật sự ảnh
+ * hưởng tới việc googlevideo chấp nhận hay từ chối. Quan trọng nhất là
+ * `User-Agent` — googlevideo ràng URL với đúng client sinh ra nó, gửi sai là 403.
+ */
+const KEEP_HEADERS = new Set([
+  'user-agent',
+  'referer',
+  'origin',
+  'cookie',
+  'accept-language',
+  'x-goog-visitor-id',
+  'sec-fetch-mode',
+]);
+
+function pickHeaders(h: any): Record<string, string> | undefined {
+  if (!h || typeof h !== 'object') return undefined;
+  const out: Record<string, string> = {};
+  for (const [k, v] of Object.entries(h)) {
+    if (typeof v === 'string' && KEEP_HEADERS.has(k.toLowerCase())) out[k] = v;
+  }
+  return Object.keys(out).length ? out : undefined;
+}
+
+/**
+ * yt-dlp đánh dấu track âm thanh bằng `language_preference`: 10 = tiếng gốc,
+ * 5 = mặc định, -1 = lồng tiếng, -10 = mô tả âm thanh. `format_note` cũng ghi
+ * "original" / "dubbed". Video chỉ có một track thì không có trường nào cả.
+ */
+function ytdlpTrack(f: any): { audioLang?: string; audioTrackName?: string; audioOriginal?: boolean } {
+  if (!f?.acodec || f.acodec === 'none') return {};
+  const pref = num(f.language_preference);
+  const note: string = f.format_note ?? '';
+  let original: boolean | undefined;
+  if (/original/i.test(note)) original = true;
+  else if (pref !== undefined && pref >= 10) original = true;
+  else if (/dubbed|descriptive/i.test(note) || (pref !== undefined && pref < 0 && f.language)) original = false;
+  return {
+    audioLang: f.language ?? undefined,
+    audioTrackName: note || undefined,
+    audioOriginal: original,
+  };
+}
+
+function mimeOf(ext: string, kind: 'video' | 'audio' | 'muxed'): string {
+  const container =
+    ext === 'webm' ? 'webm' : ext === 'm4a' || ext === 'mp4' ? 'mp4' : ext || 'mp4';
+  return `${kind === 'audio' ? 'audio' : 'video'}/${container}`;
+}
+
+/**
+ * Chiến lược trích xuất.
+ *
+ * `fast` bỏ qua bớt bước để nhanh hơn, `all` quét mọi player client nên chậm nhưng
+ * chắc ăn. Nhớ lại cái nào vừa thắng để lần sau dùng thẳng — nếu không, mỗi video
+ * phải chạy yt-dlp hai lượt và mất gấp đôi thời gian.
+ */
+type Strategy = 'fast' | 'all';
+let preferred: Strategy = 'fast';
+
+function ytdlpArgs(id: string, strategy: Strategy): string[] {
+  const args = [
+    '-J',
+    '--no-warnings',
+    '--no-playlist',
+    '--no-check-formats',
+    '--skip-download',
+    '--geo-bypass',
+    // bỏ qua file cấu hình toàn cục của máy — tránh bị chậm bởi tuỳ chọn lạ
+    '--ignore-config',
+    // Một client bị treo mà chờ 10 giây là đủ làm cả trang đứng hình.
+    '--socket-timeout', process.env.YTDLP_SOCKET_TIMEOUT ?? '5',
+    '--retries', '1',
+    '--extractor-retries', '1',
+  ];
+
+  /**
+   * Chọn player client.
+   *
+   * Chỗ này từng ghim cứng `ios,android,web`. Ngày 10/08/2026 cả ba đều chết:
+   * `ios` và `web` trả "Requested format is not available", `android` chỉ còn
+   * đúng một luồng gộp 360p. Hậu quả là mọi video đều kẹt ở 360p và menu chất
+   * lượng trống trơn — mà không có lỗi nào được ném ra, nên rất khó lần.
+   *
+   * Nên **không ghim nữa**: để yt-dlp tự chọn. Danh sách client còn sống đổi vài
+   * tháng một lần và người bảo trì yt-dlp cập nhật nhanh hơn dự án này nhiều.
+   * Đo bằng `npm run probe`: bộ mặc định trả 22 luồng hình + 4 luồng tiếng, tới
+   * 2160p, trong 2.0 giây — nhanh ngang bộ ghim cũ.
+   *
+   * Muốn ghim lại (vì YouTube siết tiếp) thì đặt biến môi trường, khỏi sửa code:
+   *
+   *   YTDLP_PLAYER_CLIENT=tv_embedded,android_vr
+   *
+   * Chạy `npm run probe -- <videoId>` để biết đặt cái gì.
+   */
+  // Tham số player client chỉ có nghĩa với YouTube; gắn vào nguồn khác là vô ích
+  if (!isBiliId(id)) {
+    if (strategy === 'all') {
+      args.push('--extractor-args', 'youtube:player_client=all');
+    } else {
+      const pinned = process.env.YTDLP_PLAYER_CLIENT?.trim();
+      if (pinned) args.push('--extractor-args', `youtube:player_client=${pinned}`);
+    }
+  }
+
+  /*
+    Cookie tách riêng theo nguồn.
+
+    `--cookies-from-browser` tự lọc theo tên miền của trang đang tải, nên dùng chung
+    được cho cả hai nguồn. Nhưng file cookies.txt thì không: file xuất từ YouTube
+    chẳng có cookie nào của bilibili, đưa vào chỉ làm yt-dlp bối rối. Vì vậy Bilibili
+    có bộ biến riêng, và **không** rơi về file cookie của YouTube.
+
+      BILI_COOKIES_FROM_BROWSER=chrome
+      BILI_COOKIES_FILE=/duong/dan/bilibili-cookies.txt
+  */
+  const bili = isBiliId(id);
+
+  const browserCookies =
+    (bili ? process.env.BILI_COOKIES_FROM_BROWSER?.trim() : '') ||
+    process.env.YTDLP_COOKIES_FROM_BROWSER?.trim();
+  if (browserCookies) args.push('--cookies-from-browser', browserCookies);
+
+  const cookieFile = bili
+    ? process.env.BILI_COOKIES_FILE?.trim()
+    : process.env.YTDLP_COOKIES_FILE?.trim();
+  if (cookieFile) args.push('--cookies', cookieFile);
+
+  const proxy = process.env.YTDLP_PROXY?.trim() || process.env.HTTP_PROXY?.trim();
+  if (proxy) args.push('--proxy', proxy);
+
+  const extra = process.env.YTDLP_ARGS?.trim();
+  if (extra) args.push(...extra.split(/\s+/).filter(Boolean));
+
+  args.push(biliUrlFromId(id) || `https://www.youtube.com/watch?v=${id}`);
+  return args;
+}
+
+/** Những lỗi mà việc đổi player client có cơ may cứu được */
+const RETRYABLE =
+  /(not available|unavailable|sign in|confirm you'?re not a bot|failed to extract|no video formats|player response|error code)/i;
+
+/** Dịch lỗi thô của yt-dlp sang câu tiếng Việt nói rõ phải làm gì */
+export function explainYtdlpError(raw: string): string {
+  const t = raw.toLowerCase();
+
+  /*
+    Bilibili.tv — các lỗi riêng của họ. Tiền tố [BiliIntl] do yt-dlp gắn vào, nên
+    nhận theo đó để không lẫn với các câu na ná của YouTube bên dưới.
+    Chuỗi "BILI_LOGIN" ở đầu là dấu hiệu cho trang xem hiện nút hướng dẫn đăng nhập.
+  */
+  if (/\[biliintl\]/.test(t)) {
+    if (/registered users|log ?in|sign ?in/.test(t))
+      return 'BILI_LOGIN Tập này chỉ xem được khi đã đăng nhập Bilibili. Cấu hình cookie một lần là xem được — không cần nhập mật khẩu vào vitube.';
+    if (/premium|vip|purchase|paid/.test(t))
+      return 'Tập này chỉ dành cho thành viên trả phí của Bilibili. vitube không mở khoá nội dung trả phí.';
+    if (/region|area|country|geo/.test(t))
+      return 'Tập này bị Bilibili giới hạn theo khu vực, không xem được từ vị trí của bạn.';
+    if (/timed out|timeout/.test(t))
+      return 'Bilibili phản hồi quá chậm. Thử lại sau ít phút.';
+  }
+
+  if (/private video/.test(t)) return 'Video này ở chế độ riêng tư.';
+  if (/members[- ]only|join this channel/.test(t))
+    return 'Video chỉ dành cho thành viên của kênh.';
+  if (/premiere|premieres in/.test(t)) return 'Video chưa công chiếu.';
+  if (/removed|terminated|deleted/.test(t))
+    return 'Video đã bị gỡ hoặc kênh đã bị xoá.';
+  if (/confirm your age|age[- ]restricted/.test(t))
+    return 'Video giới hạn độ tuổi — cần cookie đăng nhập. Đặt YTDLP_COOKIES_FROM_BROWSER=chrome trong .env rồi đóng hẳn Chrome và khởi động lại.';
+  if (/confirm you'?re not a bot|sign in to confirm/.test(t))
+    return 'YouTube nghi ngờ truy cập tự động. Đặt YTDLP_COOKIES_FROM_BROWSER=chrome trong .env, đóng hẳn Chrome rồi khởi động lại.';
+  if (/not available in your country|geo|blocked it in your country/.test(t))
+    return 'Video bị chặn ở khu vực của bạn.';
+  if (/not available/.test(t))
+    return 'YouTube từ chối phát video này — thường là do chặn khu vực, giới hạn nhúng, hoặc cần đăng nhập. Thử thêm cookie: YTDLP_COOKIES_FROM_BROWSER=chrome trong .env.';
+  if (/timed out|timeout/.test(t))
+    return 'Quá thời gian chờ khi lấy thông tin video. Thử lại, hoặc tăng YTDLP_TIMEOUT_MS.';
+
+  return raw;
+}
+
+const isWin = process.platform === 'win32';
+const exe = isWin ? 'yt-dlp.exe' : 'yt-dlp';
+
+/**
+ * Các chỗ có thể có yt-dlp, thử theo thứ tự.
+ * Đặt file vào ./bin là cách gọn nhất — không đụng tới PATH, và deploy đi đâu cũng theo.
+ */
+function candidates(): string[] {
+  const list: string[] = [];
+
+  const fromEnv = process.env.YTDLP_PATH?.trim();
+  if (fromEnv) list.push(path.resolve(fromEnv));
+
+  list.push(path.resolve(process.cwd(), 'bin', exe));
+  list.push(exe); // PATH
+
+  if (isWin) {
+    const local = process.env.LOCALAPPDATA;
+    if (local) {
+      list.push(path.join(local, 'Microsoft', 'WinGet', 'Links', exe));
+      list.push(
+        path.join(
+          local, 'Microsoft', 'WinGet', 'Packages',
+          'yt-dlp.yt-dlp_Microsoft.Winget.Source_8wekyb3d8bbwe', exe
+        )
+      );
+    }
+  } else {
+    list.push('/usr/local/bin/yt-dlp', '/usr/bin/yt-dlp', '/opt/homebrew/bin/yt-dlp');
+  }
+
+  return list;
+}
+
+let resolved: { bin: string; version: string } | null = null;
+let lastFail = 0;
+
+/**
+ * Chỉ cache kết quả THÀNH CÔNG. Thất bại thì chỉ nghỉ 5 giây rồi dò lại,
+ * để vừa tải yt-dlp xong là dùng được ngay, không phải restart server.
+ */
+async function resolveBin(): Promise<{ bin: string; version: string } | null> {
+  if (resolved) return resolved;
+  if (Date.now() - lastFail < 5_000) return null;
+
+  for (const bin of candidates()) {
+    if (path.isAbsolute(bin) && !existsSync(bin)) continue;
+    try {
+      const { stdout } = await run(bin, ['--version'], { timeout: 10_000, windowsHide: true });
+      resolved = { bin, version: stdout.trim() };
+      return resolved;
+    } catch {
+      /* thử cái tiếp theo */
+    }
+  }
+
+  lastFail = Date.now();
+  return null;
+}
+
+export function resetYtdlpCache() {
+  resolved = null;
+  lastFail = 0;
+}
+
+/** Báo cáo chi tiết từng đường dẫn đã thử — dùng cho /api/debug */
+export async function ytdlpDiagnostics() {
+  resetYtdlpCache();
+  const searched: { path: string; ton_tai: boolean; ket_qua: string }[] = [];
+
+  for (const bin of candidates()) {
+    const absolute = path.isAbsolute(bin);
+    const exists = absolute ? existsSync(bin) : true;
+    if (absolute && !exists) {
+      searched.push({ path: bin, ton_tai: false, ket_qua: 'không có file' });
+      continue;
+    }
+    try {
+      const { stdout } = await run(bin, ['--version'], { timeout: 10_000, windowsHide: true });
+      searched.push({ path: bin, ton_tai: true, ket_qua: `OK — v${stdout.trim()}` });
+    } catch (e: any) {
+      searched.push({
+        path: bin,
+        ton_tai: exists,
+        ket_qua: absolute ? `chạy lỗi: ${e?.code ?? e?.message}` : 'không có trong PATH',
+      });
+    }
+  }
+
+  return { cwd: process.cwd(), platform: process.platform, searched };
+}
+
+export function ytdlpBin(): string {
+  return resolved?.bin ?? process.env.YTDLP_PATH?.trim() ?? exe;
+}
+
+export async function isYtdlpAvailable(): Promise<boolean> {
+  return (await resolveBin()) !== null;
+}
+
+export async function ytdlpVersion(): Promise<string | null> {
+  return (await resolveBin())?.version ?? null;
+}
+
+/**
+ * Đo riêng chi phí khởi động tiến trình.
+ *
+ * Bản yt-dlp.exe trên Windows là gói PyInstaller: mỗi lần chạy phải giải nén và nạp
+ * Python, thường tốn 1–4 giây trước khi làm bất cứ việc gì. Biết con số này mới
+ * phân biệt được "chậm vì khởi động" với "chậm vì chờ YouTube".
+ */
+export async function measureStartup(): Promise<number | null> {
+  const bin = (await resolveBin())?.bin;
+  if (!bin) return null;
+
+  const t0 = Date.now();
+  try {
+    await run(bin, ['--version'], { timeout: 30_000, windowsHide: true });
+    return Date.now() - t0;
+  } catch {
+    return null;
+  }
+}
+
+/** Danh sách nơi đã tìm — để báo lỗi cho rõ */
+export function ytdlpSearchPaths(): string[] {
+  return candidates();
+}
+
+export async function getFromYtdlp(id: string): Promise<PipedResult> {
+  if (!(await isYtdlpAvailable())) {
+    throw new Error(
+      'không tìm thấy yt-dlp. Chạy `npm run setup:ytdlp` để tải tự động về thư mục bin/, ' +
+        'hoặc đặt YTDLP_PATH trong .env. Đã tìm ở: ' +
+        ytdlpSearchPaths().join(' ; ')
+    );
+  }
+
+  const exec = async (strategy: Strategy) => {
+    const t0 = Date.now();
+    try {
+      const res = await run(ytdlpBin(), ytdlpArgs(id, strategy), {
+        timeout: Number(process.env.YTDLP_TIMEOUT_MS ?? 45_000),
+        maxBuffer: 64 * 1024 * 1024,
+        windowsHide: true,
+      });
+      console.info(`[yt-dlp ${id}] ${Date.now() - t0}ms (exe/${strategy})`);
+      preferred = strategy; // cái nào chạy được thì lần sau dùng thẳng
+      return res.stdout;
+    } catch (e) {
+      console.info(`[yt-dlp ${id}] ${Date.now() - t0}ms (exe/${strategy}) HỎNG`);
+      throw e;
+    }
+  };
+
+  const readErr = (e: any) =>
+    (e?.stderr ?? '').toString().trim().split('\n').slice(-3).join(' ') ||
+    e?.message ||
+    'yt-dlp lỗi không rõ';
+
+  /**
+   * Đường nhanh: tiến trình Python thường trú.
+   *
+   * Bỏ được 1–4 giây khởi động PyInstaller mỗi lần gọi. Chỉ dùng khi máy có Python
+   * kèm gói yt_dlp; không có thì im lặng rơi xuống cách gọi file exe bên dưới.
+   */
+  let j: any = null;
+
+  // Tiến trình worker dựng cứng đường dẫn YouTube, nguồn khác phải đi đường exe
+  if (!isBiliId(id) && (await workerAvailable())) {
+    const t0 = Date.now();
+    try {
+      j = await extractViaWorker(id, preferred === 'all');
+      console.info(`[yt-dlp ${id}] ${Date.now() - t0}ms (worker/${preferred})`);
+    } catch (e: any) {
+      const msg = e?.message ?? String(e);
+
+      if (RETRYABLE.test(msg) && preferred !== 'all') {
+        try {
+          j = await extractViaWorker(id, true);
+          preferred = 'all';
+          console.info(`[yt-dlp ${id}] ${Date.now() - t0}ms (worker/all)`);
+        } catch (second: any) {
+          throw new Error(explainYtdlpError(second?.message ?? String(second)));
+        }
+      } else if (!/worker/i.test(msg)) {
+        // lỗi thật của video, không phải worker hỏng
+        throw new Error(explainYtdlpError(msg));
+      }
+      // worker trục trặc thì để rơi xuống cách gọi file exe
+    }
+  }
+
+  if (!j) {
+    // bắt đầu bằng chiến lược đã thắng lần trước, chỉ thử cái còn lại khi cần
+    const order: Strategy[] = preferred === 'all' ? ['all'] : ['fast', 'all'];
+
+    let stdout: string | null = null;
+    let lastErr = '';
+
+    for (const strategy of order) {
+      try {
+        stdout = await exec(strategy);
+        break;
+      } catch (e: any) {
+        lastErr = readErr(e);
+        // lỗi thật của video thì dừng luôn, thử tiếp chỉ tốn thời gian
+        if (!RETRYABLE.test(lastErr)) throw new Error(explainYtdlpError(lastErr));
+      }
+    }
+
+    if (!stdout) throw new Error(explainYtdlpError(lastErr));
+    j = JSON.parse(stdout);
+  }
+  const formats: PipedFormat[] = [];
+
+  /**
+   * Video trực tiếp không có file hoàn chỉnh để tải theo Range — YouTube phát bằng
+   * HLS. yt-dlp để đường dẫn master playlist ở `manifest_url` của các format m3u8.
+   * Lấy được cái đó là đủ, không cần danh sách format rời.
+   */
+  let hls: string | undefined;
+  let hlsHeaders: Record<string, string> | undefined;
+  if (j.is_live || j.live_status === 'is_live') {
+    const variants = (j.formats ?? []).filter(
+      (f: any) => /m3u8/i.test(f.protocol ?? '') || /\.m3u8/i.test(f.url ?? '')
+    );
+
+    // Ưu tiên manifest_url (master playlist, có đủ mọi chất lượng) hơn url của một
+    // biến thể đơn lẻ — chọn nhầm biến thể thì mất khả năng đổi chất lượng.
+    const withManifest = variants.find((f: any) => f.manifest_url);
+    const single = variants.find((f: any) => /\.m3u8/i.test(f.url ?? ''));
+    hls = withManifest?.manifest_url ?? j.manifest_url ?? single?.url ?? undefined;
+
+    // Mang theo header của ĐÚNG biến thể vừa chọn. Thiếu cái này thì proxy gọi
+    // manifest live bằng UA Chrome mặc định — URL do client khác sinh ra ⇒ 403,
+    // Shaka báo lỗi ngay và video trực tiếp không bao giờ tải được.
+    const src = withManifest ?? single ?? variants[0];
+    hlsHeaders = pickHeaders(src?.http_headers) ?? pickHeaders(j.http_headers);
+  }
+
+  for (const f of j.formats ?? []) {
+    if (!f?.url) continue;
+    // bỏ luồng HLS/DASH-segment, chỉ lấy file phát trực tiếp được
+    if (f.protocol && !/^https?$/.test(f.protocol)) continue;
+
+    const hasVideo = f.vcodec && f.vcodec !== 'none';
+    const hasAudio = f.acodec && f.acodec !== 'none';
+    if (!hasVideo && !hasAudio) continue;
+
+    const kind: 'video' | 'audio' | 'muxed' =
+      hasVideo && hasAudio ? 'muxed' : hasVideo ? 'video' : 'audio';
+
+    const codecs = [cleanCodec(f.vcodec), cleanCodec(f.acodec)].filter(Boolean).join(', ');
+
+    formats.push({
+      url: f.url,
+      mimeType: mimeOf(f.ext, kind),
+      codecs,
+      bitrate: Math.round((num(f.tbr) ?? num(f.vbr) ?? num(f.abr) ?? 0) * 1000),
+      itag: num(f.format_id) ?? 0,
+      kind,
+      width: num(f.width),
+      height: num(f.height),
+      fps: num(f.fps),
+      audioSampleRate: num(f.asr),
+      audioChannels: num(f.audio_channels),
+      contentLength: num(f.filesize) ?? num(f.filesize_approx),
+      ...ytdlpTrack(f),
+      // yt-dlp tự chọn player client và mỗi client cần một User-Agent riêng —
+      // không mang theo là proxy gọi bằng UA sai rồi ăn 403.
+      headers: pickHeaders(f.http_headers) ?? pickHeaders(j.http_headers),
+    });
+  }
+
+  const isLive = !!(j.is_live || j.live_status === 'is_live');
+
+  return {
+    source: isBiliId(id) ? 'yt-dlp:bilibili' : 'yt-dlp',
+    title: j.title ?? '',
+    description: j.description ?? '',
+    uploader: j.uploader ?? j.channel ?? j.series ?? '',
+    thumbnail: j.thumbnail ?? '',
+    durationSec: num(j.duration) ?? 0,
+    isLive,
+    hls,
+    hlsHeaders: hls ? hlsHeaders : undefined,
+    // Live mà đã có HLS thì bỏ các format rời đi: chúng là đoạn cố định, phát
+    // được vài phút rồi đứng, mà lại được ưu tiên hơn HLS ở phía trình phát.
+    formats: isLive && hls ? [] : formats,
+  };
+}

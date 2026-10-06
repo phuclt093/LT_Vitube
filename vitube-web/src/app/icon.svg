@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- bản cho cỡ nhỏ (≤32px): bỏ khung, nét dày hơn để không nhoè -->
+  <rect x="40" y="40" width="944" height="944" rx="190" fill="#a93a2e"/>
+  <path d="M420 300 L664 512 L420 724" fill="none" stroke="#faf7f0" stroke-width="128" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

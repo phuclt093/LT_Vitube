@@ -1,0 +1,89 @@
+# ---- Source tham khảo, không đưa lên repo ----
+YMusic-Youtube-Multilingual-Music-Player-for-Android-master/
+YMusic-Youtube-Multilingual-Music-Player-for-Android-master.zip
+
+# ---- Node / Next.js ----
+# nơi build:pages tạm cất route API — tự dọn sau mỗi lần build
+.pages-stash/
+node_modules/
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# ---- Biến môi trường & dữ liệu ----
+.env
+.env.local
+.env.*.local
+# Chỉ thư mục dữ liệu của server (SQLite, cache luồng) — KHÔNG được viết trần
+# `data/`: như thế là bỏ qua MỌI thư mục tên data, kể cả mã nguồn
+# vitube-tv/core/src/main/java/com/vitube/core/data/ (Api.kt, Settings.kt…).
+# Dòng trần đó đã làm thư mục mã nguồn này chưa bao giờ lên được git.
+/data/
+vitube-web/data/
+vitube-desktop/data/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.db
+
+# ---- yt-dlp tải về ----
+vitube-web/bin/*
+!vitube-web/bin/.gitkeep
+
+# ---- Android ----
+.gradle/
+local.properties
+*.apk
+*.aab
+*.keystore
+*.jks
+captures/
+.cxx/
+app/release/
+
+# ---- IDE ----
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+
+# ---- Hệ điều hành ----
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---- Log ----
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# san pham build cua app desktop
+vitube-desktop/resources/
+vitube-desktop/release/
+
+# Icon app: `build/` o tren bi chan (danh cho thu muc build cua Gradle/Next),
+# nhung vitube-desktop/build/ la thu muc TAI NGUYEN cua electron-builder — mat no
+# thi ban dong goi quay ve icon Electron mac dinh.
+!vitube-desktop/build/
+!vitube-desktop/build/icon.svg
+!vitube-desktop/build/icon.png
+!vitube-desktop/build/icon.ico
+
+# virtualenv Python cho yt-dlp worker
+.venv/
+
+# ---- vitube_PWA ----
+# chứng chỉ ký APK: bí mật, mất là không cập nhật được app cho người đã cài
+keystore.properties
+# APK đã build để trang /install phát cho người dùng — build lại từ mã nguồn được
+vitube-web/public/download/
+vitube_PWA/icons/_preview.png
+vitube_PWA/bin/
+vitube_PWA/logs/
+vitube_PWA/data/
+vitube_PWA/.env

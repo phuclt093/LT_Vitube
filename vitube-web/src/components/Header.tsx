@@ -1,0 +1,253 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import Logo from './Logo';
+import AuthMenu from './AuthMenu';
+import NavButtons from './NavButtons';
+import { MenuIcon, SearchIcon, MicIcon, CloseIcon, HistoryIcon } from './Icons';
+import { biliIdFromUrl } from '@/lib/bili';
+
+/** Link YouTube (watch, youtu.be, shorts, embed) → id; không phải thì trả '' */
+function youtubeIdFromUrl(raw: string): string {
+  let u: URL;
+  try {
+    u = new URL(raw.trim());
+  } catch {
+    return '';
+  }
+
+  const ok = (v?: string | null) => (v && /^[\w-]{11}$/.test(v) ? v : '');
+
+  if (/^youtu\.be$/i.test(u.hostname)) return ok(u.pathname.slice(1));
+  if (!/(^|\.)youtube(-nocookie)?\.com$/i.test(u.hostname)) return '';
+
+  const seg = u.pathname.split('/').filter(Boolean);
+  if (seg[0] === 'shorts' || seg[0] === 'embed' || seg[0] === 'live') return ok(seg[1]);
+  return ok(u.searchParams.get('v'));
+}
+
+export default function Header({ onToggleMenu }: { onToggleMenu: () => void }) {
+  const router = useRouter();
+  const params = useSearchParams();
+  const pathname = usePathname();
+  const [q, setQ] = useState(params.get('q') ?? '');
+
+  /*
+    Tìm ở đâu: YouTube hay Bilibili.
+
+    Mặc định theo ngữ cảnh — đang ở tab Bilibili, đang xem phim Bilibili, hay đang
+    xem kết quả Bilibili thì tìm tiếp trên Bilibili; còn lại là YouTube. Bấm nút nguồn
+    ở đầu ô tìm kiếm để đổi tay.
+  */
+  const contextSrc: 'yt' | 'bili' =
+    pathname.startsWith('/bili') ||
+    (pathname === '/watch' && (params.get('v') ?? '').startsWith('bili_')) ||
+    (pathname === '/results' && params.get('src') === 'bili')
+      ? 'bili'
+      : 'yt';
+  const [src, setSrc] = useState<'yt' | 'bili'>(contextSrc);
+  useEffect(() => setSrc(contextSrc), [contextSrc]);
+  const [sugs, setSugs] = useState<string[]>([]);
+  const [openSug, setOpenSug] = useState(false);
+  const [mobileSearch, setMobileSearch] = useState(false);
+  const boxRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => setQ(params.get('q') ?? ''), [params]);
+
+  useEffect(() => {
+    if (!q.trim()) {
+      setSugs([]);
+      return;
+    }
+    const t = setTimeout(async () => {
+      try {
+        const r = await fetch(`/api/suggest?q=${encodeURIComponent(q)}`);
+        const j = await r.json();
+        setSugs(j.suggestions ?? []);
+      } catch {}
+    }, 180);
+    return () => clearTimeout(t);
+  }, [q]);
+
+  useEffect(() => {
+    const h = (e: MouseEvent) => {
+      if (boxRef.current && !boxRef.current.contains(e.target as Node)) setOpenSug(false);
+    };
+    document.addEventListener('mousedown', h);
+    return () => document.removeEventListener('mousedown', h);
+  }, []);
+
+  // "/" nhảy vào ô tìm kiếm, Esc thoát ra — giống YouTube
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName;
+      const typing = tag === 'INPUT' || tag === 'TEXTAREA';
+
+      if (e.key === '/' && !typing) {
+        e.preventDefault();
+        setMobileSearch(true);
+        inputRef.current?.focus();
+      } else if (e.key === 'Escape' && typing) {
+        inputRef.current?.blur();
+        setOpenSug(false);
+      }
+    };
+    window.addEventListener('keydown', h);
+    return () => window.removeEventListener('keydown', h);
+  }, []);
+
+  const go = (term: string) => {
+    const t = term.trim();
+    if (!t) return;
+    setOpenSug(false);
+    setMobileSearch(false);
+
+    /*
+      Dán nguyên đường dẫn thì mở thẳng video, đừng đem cả cái URL đi tìm kiếm.
+      Hiện nhận bilibili.tv và các dạng link YouTube quen thuộc.
+    */
+    const direct = biliIdFromUrl(t) || youtubeIdFromUrl(t);
+    if (direct) {
+      router.push(`/watch?v=${direct}`);
+      return;
+    }
+
+    router.push(`/results?q=${encodeURIComponent(t)}${src === 'bili' ? '&src=bili' : ''}`);
+  };
+
+  return (
+    <header className="glass fixed inset-x-0 top-0 z-50 flex h-14 items-center justify-between gap-4 px-4">
+      {/* trái */}
+      <div className={`flex items-center gap-2 sm:gap-3 ${mobileSearch ? 'hidden sm:flex' : 'flex'}`}>
+        <button
+          onClick={onToggleMenu}
+          className="rounded-full p-2 hover:bg-yt-hover"
+          aria-label="Mở menu"
+        >
+          <MenuIcon />
+        </button>
+        <NavButtons />
+        <Logo />
+      </div>
+
+      {/* giữa: search */}
+      <div
+        ref={boxRef}
+        className={`${mobileSearch ? 'flex' : 'hidden sm:flex'} flex-1 items-center justify-center gap-2 max-w-[732px]`}
+      >
+        {mobileSearch && (
+          <button className="rounded-full p-2 hover:bg-yt-hover sm:hidden" onClick={() => setMobileSearch(false)}>
+            <CloseIcon />
+          </button>
+        )}
+        <div className="relative flex w-full">
+          {/*
+            Ô nhập và nút kính lúp nằm chung một khung bo tròn. Trước đây mỗi phần
+            có viền riêng: lúc focus chỉ nửa trái đổi màu, cộng thêm khung vuông
+            của :focus-visible bên trong — nhìn như ô bị vỡ.
+          */}
+          <div className="search-focus flex w-full overflow-hidden rounded-full border border-yt-border bg-yt-bg2">
+          <div className="flex min-w-0 flex-1 items-center pl-1.5 pr-2">
+            {/*
+              Nút nguồn: cùng kiểu chấm màu + tên với thanh chuyển nguồn bên phải.
+              Chỉ có hai nguồn nên bấm là đổi luôn, khỏi mở menu.
+            */}
+            <button
+              type="button"
+              onClick={() => {
+                setSrc((s) => (s === 'yt' ? 'bili' : 'yt'));
+                inputRef.current?.focus();
+              }}
+              title={src === 'bili' ? 'Đang tìm trên Bilibili — bấm để đổi sang YouTube' : 'Đang tìm trên YouTube — bấm để đổi sang Bilibili'}
+              className="mr-2 flex shrink-0 items-center gap-1.5 rounded-full bg-yt-chip px-2.5 py-1 text-xs font-medium hover:bg-yt-chip2"
+            >
+              <span className={`h-2 w-2 rounded-full ${src === 'bili' ? 'bg-sky-400' : 'bg-red-500'}`} />
+              {src === 'bili' ? 'Bilibili' : 'YouTube'}
+              <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 text-yt-sub" fill="currentColor" aria-hidden>
+                <path d="M7 10l5 5 5-5z" />
+              </svg>
+            </button>
+            <input
+              ref={inputRef}
+              value={q}
+              onChange={(e) => {
+                setQ(e.target.value);
+                setOpenSug(true);
+              }}
+              onFocus={() => setOpenSug(true)}
+              onKeyDown={(e) => e.key === 'Enter' && go(q)}
+              placeholder={src === 'bili' ? 'Tìm trên Bilibili  ( / )' : 'Tìm kiếm  ( / )'}
+              className="h-10 w-full bg-transparent text-base outline-none placeholder:text-yt-sub/80"
+            />
+            {q && (
+              <button onClick={() => setQ('')} aria-label="Xoá" className="rounded-full p-1 text-yt-sub hover:bg-yt-hover hover:text-yt-text">
+                <CloseIcon className="h-5 w-5" />
+              </button>
+            )}
+          </div>
+          <button
+            onClick={() => go(q)}
+            aria-label="Tìm kiếm"
+            className="search-btn flex w-16 shrink-0 items-center justify-center border-l border-yt-border bg-yt-elev text-yt-sub hover:bg-yt-hover hover:text-yt-text"
+          >
+            <SearchIcon className="h-5 w-5" />
+          </button>
+          </div>
+
+          {openSug && sugs.length > 0 && (
+            <ul className="anim-pop absolute left-0 right-16 top-12 z-50 origin-top overflow-hidden rounded-xl border border-yt-border bg-yt-bg py-2 shadow-[0_12px_32px_-12px_rgb(60_40_20/.28)]">
+              {sugs.map((s) => (
+                <li key={s}>
+                  <button
+                    onMouseDown={() => go(s)}
+                    className="flex w-full items-center gap-4 px-4 py-1.5 text-left text-base hover:bg-yt-hover"
+                  >
+                    <HistoryIcon className="h-5 w-5 shrink-0 text-yt-sub" />
+                    <span className="truncate">{s}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        <button className="hidden rounded-full bg-yt-elev p-2.5 hover:bg-yt-hover sm:block" aria-label="Tìm bằng giọng nói">
+          <MicIcon className="h-5 w-5" />
+        </button>
+      </div>
+
+      {/* phải */}
+      <div className={`flex items-center gap-2 ${mobileSearch ? 'hidden' : 'flex'}`}>
+        {/* Chuyển nguồn nhanh: YouTube / Bilibili */}
+        <div className="hidden lg:flex items-center rounded-full bg-yt-chip p-1 border border-yt-border text-xs font-medium mr-1">
+          <button
+            onClick={() => router.push('/')}
+            className="flex items-center gap-1.5 rounded-full px-3 py-1 text-yt-text hover:bg-yt-hover transition"
+            title="Chuyển sang nguồn YouTube"
+          >
+            <span className="h-2 w-2 rounded-full bg-red-500"></span>
+            YouTube
+          </button>
+          <button
+            onClick={() => router.push('/bili')}
+            className="flex items-center gap-1.5 rounded-full px-3 py-1 text-yt-text hover:bg-yt-hover transition"
+            title="Chuyển sang nguồn Bilibili"
+          >
+            <span className="h-2 w-2 rounded-full bg-sky-400"></span>
+            Bilibili
+          </button>
+        </div>
+
+        <button
+          className="rounded-full p-2 hover:bg-yt-hover sm:hidden"
+          onClick={() => setMobileSearch(true)}
+          aria-label="Tìm kiếm"
+        >
+          <SearchIcon />
+        </button>
+        <AuthMenu />
+      </div>
+    </header>
+  );
+}

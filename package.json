@@ -1,0 +1,19 @@
+{
+  "name": "vitube",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Lối vào chung cho cả kho — chạy được từ thư mục gốc, khỏi phải nhớ cd vào đâu",
+  "scripts": {
+    "dev": "npm --prefix vitube-desktop run dev",
+    "dev:web": "npm --prefix vitube-web run dev",
+    "build:pages": "npm --prefix vitube-web run build:pages",
+    "build": "node scripts/build.mjs",
+    "check": "node scripts/build.mjs --check",
+    "typecheck": "npm --prefix vitube-web run typecheck",
+    "db:check": "npm --prefix vitube-web run db:check",
+    "link:db": "node scripts/link-db.mjs",
+    "probe": "npm --prefix vitube-web run probe --",
+    "icon": "npm --prefix vitube-desktop run icon",
+    "update:ytdlp": "npm --prefix vitube-web run update:ytdlp"
+  }
+}

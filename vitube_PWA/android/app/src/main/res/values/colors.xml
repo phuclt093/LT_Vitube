@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- nền kem của vitube, khớp theme_color trong manifest web -->
+    <color name="vitube_bg">#FAF7F0</color>
+    <color name="vitube_red">#A93A2E</color>
+</resources>
