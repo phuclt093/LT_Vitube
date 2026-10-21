@@ -10,7 +10,12 @@
         "col": 4
       }
     },
-    "chat": [],
-    "updatedAt": "2026-10-21T08:24:52.309Z"
+    "chat": [
+      {
+        "role": "user",
+        "text": "bạn có nhớ lần cuối làm cái vitube là đang làm gì không"
+      }
+    ],
+    "updatedAt": "2026-10-21T08:25:18.544Z"
   }
 }
