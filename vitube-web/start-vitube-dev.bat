@@ -1,4 +1,4 @@
-@echo off
+ban@echo off
 title vitube (dev)
 cd /d "%~dp0"
 
