@@ -66,9 +66,13 @@
       {
         "role": "tool",
         "text": "📄 Read docs/CONTEXT.md"
+      },
+      {
+        "role": "assistant",
+        "text": "**vitube** là bộ ứng dụng **xem YouTube không quảng cáo**, giao diện làm giống YouTube (nền tối). Tóm tắt dưới đây mình đọc từ `README.md` và `docs/CONTEXT.md`, chưa chạy thử app.\n\n## Các phần trong repo\n\n| Thư mục | Là gì | Trạng thái (theo `docs/CONTEXT.md`) |\n|---|---|---|\n| `vitube-web/` | Next.js 15 + TypeScript + Tailwind. Vừa là giao diện web, vừa là server API cho mọi app khác | Chạy được |\n| `vitube-desktop/` | Bọc Electron cho Windows, macOS, Linux | Windows chạy được; bản đóng gói Linux chưa cài thử |\n| `vitube-tv/` | App Android (Kotlin + Compose + Media3), gồm 3 phần: phần lõi dùng chung, giao diện TV và giao diện điện thoại | Chưa biên dịch thử |\n| `vitube_PWA/` | Bản PWA với docker-compose và HTTPS | Không có trong bảng trạng thái |\n| `.github/workflows/pages.yml` | Đưa giao diện lên GitHub Pages; video vẫn cần server vitube chạy HTTPS ở nhà hoặc trên VPS | Mới thêm ngày 06/10 |\n\n## Cách hoạt động\n- **Lấy video**: thử lần lượt 3 nguồn là **yt-dlp** (đáng tin nhất), InnerTube (`youtubei.js`), rồi Piped/Invidious. Phải làm vậy vì YouTube đã chuyển sang SABR, không còn trả thẳng link video.\n- **Proxy `/api/stream`**: mọi byte video đi qua server, vì link `googlevideo.com` bị khoá theo IP và không cho trình duyệt gọi thẳng.\n- **Trình phát**: shaka-player phát DASH nên xem được 1080p trở lên. Nếu không dựng được thì lùi về chế độ \"2 luồng\" hoặc luồng gộp (tối đa 360p).\n- **Dữ liệu người dùng**: tài khoản nội bộ, lịch sử, xem sau, đã thích, kênh đăng ký. Lưu được ở Turso (cloud), SQLite hoặc file JSON.\n\n## Đã có\nTrang chủ 23 chủ đề, tìm kiếm, trang kênh, bình luận, xem trực tiếp có chat, phím tắt kiểu YouTube, chủ đề màu tự chỉnh, xem trước khi rê chuột, cửa sổ nổi.\n\n## Chưa xong và điểm yếu\n- Chưa có Shorts, playlist thật, xem tiếp từ chỗ dở, SponsorBlock. App TV chưa nối vào tài khoản.\n- Video chưa có trong cache mất **5–13 giây** mới phát, do mỗi lần lại khởi động yt-dlp.\n- Chưa có cơ chế **tự cập nhật yt-dlp** trên máy người dùng. Bản cũ thì video chỉ còn 360p hoặc bị lỗi 403.\n- Chế độ 2 luồng không tự hạ chất lượng khi mạng yếu, nên sẽ bị giật.\n\n## Lần làm gần nhất\nMục cuối của nhật ký trong `docs/CONTEXT.md` (16/09/2026): sửa lỗi **mọi video bị 403 trên bản desktop Linux**. Nguyên nhân là app dùng bản yt-dlp cũ có sẵn trong Python của máy thay cho bản mới đi kèm app. Đã sửa cùng lỗi bản đóng gói không đọc được Turso.\n\nSau mục đó chỉ có thêm workflow GitHub Pages (06/10) và vài sửa lặt vặt (21/10). Nhật ký chưa ghi hai việc này.\n\nFile `start-vitube-dev.bat` vẫn còn lỗi gõ nhầm `ban@echo off` ở dòng đầu. Bạn muốn mình sửa không?"
       }
     ],
-    "updatedAt": "2026-10-21T08:26:36.530Z",
+    "updatedAt": "2026-10-21T08:26:50.219Z",
     "homeSession": "f5e84e28-1291-4b50-848a-524fad91dced"
   }
 }
