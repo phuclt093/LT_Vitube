@@ -4,7 +4,7 @@
       "vitube-web/start-vitube-dev.bat",
       "BUILD-LINUX.sh"
     ],
-    "active": "BUILD-LINUX.sh",
+    "active": "vitube-web/start-vitube-dev.bat",
     "cursors": {
       "vitube-web/start-vitube-dev.bat": {
         "line": 1,
@@ -35,7 +35,7 @@
         "text": "✗     at throwIneligibleOrProjectIdError (file:///home/phuclt/.local/lib/node_modules/@google/gemini-cli/bundle/chunk-DKZARV6U.js:312319:11)     at _doSetupUser (file:///home/phuclt/.local/lib/node_modules/@google/gemini-cli/bundle/chunk-DKZARV6U.js:312308:5)     at process.processTicksAndRejections (node:internal/process/task_queues:103:5)"
       }
     ],
-    "updatedAt": "2026-10-25T13:15:40.042Z",
+    "updatedAt": "2026-10-25T13:20:05.321Z",
     "homeSession": null,
     "claudeTask": null,
     "geminiSession": null,
