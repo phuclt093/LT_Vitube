@@ -38,9 +38,13 @@
         "role": "user",
         "text": "ALO",
         "images": []
+      },
+      {
+        "role": "tool",
+        "text": "✗ Google đã ngừng cho tài khoản Google cá nhân (gói miễn phí) dùng Gemini qua Gemini CLI. Cách dùng tiếp: tạo **Gemini API key** miễn phí ở aistudio.google.com/apikey rồi dán vào ⚙ Cài đặt → Gemini → \"Dùng Gemini API key\"."
       }
     ],
-    "updatedAt": "2026-10-25T15:32:58.720Z",
+    "updatedAt": "2026-10-25T15:33:09.922Z",
     "homeSession": null,
     "claudeTask": null,
     "geminiSession": null,
