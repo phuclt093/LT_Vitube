@@ -2,9 +2,10 @@
   "main": {
     "tabs": [
       "vitube-web/start-vitube-dev.bat",
-      "BUILD-LINUX.sh"
+      "BUILD-LINUX.sh",
+      "HUONG-DAN.txt"
     ],
-    "active": "vitube-web/start-vitube-dev.bat",
+    "active": "HUONG-DAN.txt",
     "cursors": {
       "vitube-web/start-vitube-dev.bat": {
         "line": 1,
@@ -13,6 +14,10 @@
       "BUILD-LINUX.sh": {
         "line": 26,
         "col": 26
+      },
+      "HUONG-DAN.txt": {
+        "line": 1,
+        "col": 1
       }
     },
     "chat": [
@@ -58,7 +63,7 @@
         "text": "✗ Claude đang làm một việc khác trong repo này, chờ xong đã."
       }
     ],
-    "updatedAt": "2026-10-25T15:37:00.253Z",
+    "updatedAt": "2026-10-26T00:59:45.468Z",
     "homeSession": null,
     "claudeTask": null,
     "geminiSession": "26f99de3-194a-44de-97bf-236b70a078fd",
