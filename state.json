@@ -948,9 +948,15 @@
       {
         "role": "tool",
         "text": "$ cd ~/xemchua-server && B=http://127.0.0.1:3000\ncurl -s -XPOST $B/api/auth/register -H 'content-type: application/json' -"
+      },
+      {
+        "role": "assistant",
+        "text": "Đã làm xong tính năng quên mật khẩu, server trên máy nhà đã chạy bản mới. Chỉ còn thiếu tài khoản email để server gửi thư, và phần này bạn phải tự điền.\n\n**Cách hoạt động:**\n- Ở khung Đăng nhập có thêm nút **\"Quên mật khẩu?\"**. Bạn nhập email, server gửi một link đặt lại.\n- Link mở trang **Đặt mật khẩu mới** (`/reset-password/`). Lưu xong là bạn được đăng nhập luôn, còn các thiết bị khác bị đăng xuất.\n- Link hết hạn sau 30 phút và chỉ dùng được một lần.\n- Trang luôn trả cùng một câu trả lời dù email có đăng ký hay không, để người lạ không dò được email nào có tài khoản. Mỗi email chỉ xin được 1 link mỗi phút.\n\n**Đã kiểm tra trên server máy nhà** bằng một tài khoản thử (đã xoá sau khi thử):\n- Đặt lại bằng link hợp lệ thì thành công.\n- Dùng lại link cũ thì bị từ chối.\n- Đăng nhập bằng mật khẩu mới được.\n\nBước gửi email thật thì chưa thử được, vì chưa có tài khoản Gmail để gửi. Hiện bấm \"Gửi link\" sẽ báo *\"Server chưa cấu hình gửi email\"*.\n\n**Việc bạn cần làm (tự làm, đừng dán mật khẩu vào chat):**\n1. Vào https://myaccount.google.com/apppasswords để tạo một **mật khẩu ứng dụng** (Gmail phải bật xác minh 2 bước trước).\n2. Mở file `~/xemchua-server/.env.local` (mình đã tạo sẵn mẫu), điền:\n   ```\n   SMTP_USER=phuclt093@gmail.com\n   SMTP_PASS=<16 ký tự vừa tạo>\n   ```\n3. Chạy: `systemctl --user restart xemchua`\n\n**Lưu ý:**\n- Trên xemchua.pages.dev phải merge `titor/wip/main` vào `main` thì mới thấy nút \"Quên mật khẩu\".\n- Mình chưa làm phần \"quên tài khoản\", vì tài khoản đăng nhập chính là email. Nếu quên luôn email nào, bạn thử nhập lần lượt các email đang dùng vào ô \"Quên mật khẩu\".\n\nMình đã cài thêm thư viện `nodemailer` để gửi mail. Code mới nằm ở `vitube-web/src/lib/mail.ts`, `lib/reset.ts`, `app/api/auth/forgot`, `app/api/auth/reset` và `app/reset-password`.",
+        "by": "Claude Code · claude-opus-5-5",
+        "at": "2026-10-28T08:17:49.290Z"
       }
     ],
-    "updatedAt": "2026-10-28T08:17:36.739Z",
+    "updatedAt": "2026-10-28T08:17:52.042Z",
     "homeSession": "c4c042f3-c78f-4a7e-85e6-17f79f9179ac",
     "claudeTask": null,
     "geminiSession": "26f99de3-194a-44de-97bf-236b70a078fd",
