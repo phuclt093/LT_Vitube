@@ -818,9 +818,13 @@
         "text": "Mình đã kiểm tra cả hai lỗi trên server. Lỗi live chưa tái hiện được, còn trang chủ thì đã rõ nguyên nhân. Mình chưa sửa gì thêm.\n\n**1. Video live**\n- Mình thử một luồng đang phát thật (Lofi Girl): server trả về luồng phát live (HLS) và gọi từ trang xemchua sang vẫn được cho phép. Mình chưa thử phát bằng trình duyệt thật.\n- Khi thử một luồng live đã kết thúc, YouTube trả lời *\"Chức năng ghi luồng trực tiếp này không khả dụng\"*. Tức là video đó đã hết live và không có bản ghi, nên không app nào xem được.\n- Bạn gửi mình link video live đang lỗi, hoặc chụp màn hình thông báo lỗi trên trình phát, để mình xem đúng video đó.\n\n**2. Trang chủ lúc nào cũng ra mấy video giống nhau**\n\nTrang chủ xemchua tự trộn video dựa trên **kênh đăng ký và lịch sử xem**. Hiện cả hai đều trống, vì hai lý do:\n- **xemchua.pages.dev là một trang mới.** Lịch sử và kênh đăng ký bạn có trước đây nằm trong trình duyệt ở trang cũ (app desktop, GitHub Pages…), không tự chuyển sang. Màn hình Cài đặt của bạn hiện ghi *0 video, 0 kênh*.\n- **Server trên máy này dùng một cơ sở dữ liệu mới, trống.** Tài khoản cũ của bạn không có trong đó, và bạn cũng đang chưa đăng nhập.\n\nKhông có dữ liệu nào để trộn, nên server lấy video chung của YouTube. Mà YouTube không trả trang chủ cho người chưa đăng nhập (log ghi `getHomeFeed: rỗng`), nên server phải lấy tạm từ một lần tìm kiếm cố định. Vì vậy lần nào mở cũng ra đúng mấy video đó.\n\n**Cách khắc phục, tuỳ bạn:**\n- **Bạn có tài khoản xemchua cũ dùng Turso** (lệnh `npm run db:check` / `link:db`): bạn tự chép `TURSO_DATABASE_URL` và `TURSO_AUTH_TOKEN` vào file `~/xemchua-server/.env.local` trên máy này, **đừng dán vào chat**. Báo mình, mình khởi động lại server. Sau đó bạn đăng nhập trên xemchua.pages.dev là có lại lịch sử và kênh đăng ký.\n- **Không có tài khoản cũ:** bạn bấm **Đăng nhập → tạo tài khoản**, rồi đăng ký vài kênh và xem vài video. Trang chủ sẽ bắt đầu theo sở thích của bạn.\n\nBạn có tài khoản cũ trên Turso không?",
         "by": "Claude Code · claude-opus-5-5",
         "at": "2026-10-28T07:38:55.948Z"
+      },
+      {
+        "role": "tool",
+        "text": "🗜 Đã thu gọn phiên: 120k → 14k token — AI vẫn nhớ việc đang làm."
       }
     ],
-    "updatedAt": "2026-10-28T07:38:57.156Z",
+    "updatedAt": "2026-10-28T07:40:10.142Z",
     "homeSession": "c4c042f3-c78f-4a7e-85e6-17f79f9179ac",
     "claudeTask": null,
     "geminiSession": "26f99de3-194a-44de-97bf-236b70a078fd",
