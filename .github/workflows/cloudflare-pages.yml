@@ -1,0 +1,65 @@
+# Đưa giao diện vitube lên Cloudflare Pages (https://xemchua.pages.dev) mỗi lần push lên main.
+# Cần 2 secret: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID. Chi tiết: docs/CLOUDFLARE-PAGES.md
+name: Deploy Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudflare-pages
+  cancel-in-progress: true
+
+env:
+  CF_PROJECT: xemchua
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      # Chưa đặt secret thì bỏ qua êm, không làm đỏ cả lượt push
+      - name: Kiểm tra secret
+        id: check
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::warning::Chưa đặt CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID — bỏ qua deploy Cloudflare"
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - if: steps.check.outputs.ok == 'true'
+        uses: actions/checkout@v4
+
+      - if: steps.check.outputs.ok == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: vitube-web/package-lock.json
+
+      - if: steps.check.outputs.ok == 'true'
+        run: npm ci
+        working-directory: vitube-web
+
+      # Cloudflare Pages phục vụ ở gốc tên miền → không cần basePath
+      - if: steps.check.outputs.ok == 'true'
+        run: npm run build:pages
+        working-directory: vitube-web
+        env:
+          VITUBE_BASE_PATH: ''
+          NEXT_PUBLIC_VITUBE_API_URL: ${{ vars.VITUBE_API_URL }}
+
+      # Lần đầu tạo project; các lần sau báo "đã tồn tại" — bỏ qua
+      - if: steps.check.outputs.ok == 'true'
+        run: npx --yes wrangler@3 pages project create "$CF_PROJECT" --production-branch=main || true
+
+      - if: steps.check.outputs.ok == 'true'
+        run: npx --yes wrangler@3 pages deploy vitube-web/out --project-name="$CF_PROJECT" --branch=main --commit-dirty=true

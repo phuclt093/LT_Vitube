@@ -8,6 +8,7 @@ Xem YouTube không quảng cáo, giao diện bám sát YouTube.
 | `vitube-desktop/` | Vỏ Electron, tự khởi động server, không cần terminal |
 | `vitube-tv/` | App Android TV (Kotlin + Compose TV + Media3) |
 | `docs/GITHUB-PAGES.md` | Đưa giao diện lên GitHub Pages, trỏ về server vitube của bạn |
+| `docs/CLOUDFLARE-PAGES.md` | Đưa giao diện lên Cloudflare Pages — `https://xemchua.pages.dev` |
 | `docs/CONTEXT.md` | **Đọc file này trước** — kiến trúc, quyết định, những hướng đã thất bại, nhật ký tiến độ |
 
 ## Chạy trên GitHub Pages

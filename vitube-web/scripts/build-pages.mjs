@@ -82,6 +82,11 @@ if (status !== 0) process.exit(status);
 const out = join(root, 'out');
 // GitHub Pages chạy Jekyll mặc định — Jekyll bỏ qua thư mục bắt đầu bằng "_" như _next/
 writeFileSync(join(out, '.nojekyll'), '');
+// Cloudflare Pages đọc _headers — service worker không được cache lâu (GitHub Pages bỏ qua file này)
+writeFileSync(
+  join(out, '_headers'),
+  `${basePath}/sw.js\n  Cache-Control: no-cache\n  Service-Worker-Allowed: ${basePath || '/'}\n`,
+);
 // offline.html là file tĩnh viết tay, không qua basePath của Next
 const offline = join(out, 'offline.html');
 if (basePath && existsSync(offline)) {
