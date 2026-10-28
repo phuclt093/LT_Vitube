@@ -395,9 +395,19 @@
       {
         "role": "tool",
         "text": "✏️ Edit README.md"
+      },
+      {
+        "role": "assistant",
+        "text": "Được bạn. Mình viết hẳn một file hướng dẫn chi tiết `docs/ORACLE-FREE.md` kèm một script cài tự động, để trên máy Oracle bạn chỉ cần dán **một lệnh**. Script mới được kiểm tra cú pháp, chưa chạy thử trên máy Oracle thật nên lần đầu có thể phải chỉnh nhỏ.\n\n**Tóm tắt 5 bước:**\n\n1. **Tạo tài khoản** ở https://signup.cloud.oracle.com. Phần Home Region chọn **Singapore**, vì chọn rồi không đổi được. Bạn cần xác minh thẻ Visa/Mastercard: Oracle giữ tạm khoảng 1 USD rồi trả lại, gói Always Free không bị tính tiền.\n2. **Tạo máy ảo**: vào Compute → Instances → Create.\n   - Image: **Ubuntu 24.04**\n   - Shape: **VM.Standard.A1.Flex** (2 OCPU, 12 GB RAM)\n   - SSH: bấm **Save private key** để tải file khoá về.\n   - Nếu báo \"Out of capacity\" thì thử lại lúc sáng sớm, hoặc chọn máy nhỏ `E2.1.Micro`.\n3. **Đăng nhập vào máy:**\n   ```bash\n   ssh -i ~/Downloads/ssh-key-*.key ubuntu@<Public IP>\n   ```\n4. **Dán lệnh cài đặt:**\n   ```bash\n   curl -fsSL https://raw.githubusercontent.com/phuclt093/LT_Vitube/main/vitube_PWA/oracle-setup.sh | bash\n   ```\n   Script tự thêm bộ nhớ swap, cài Docker, tải code, build và chạy server, rồi cài Tailscale. Bạn chỉ phải bấm 2 lần:\n   - Mở link để **đăng nhập Tailscale**.\n   - Mở link để **bật Funnel**, rồi chạy lại đúng lệnh ở trên.\n5. Script in ra địa chỉ dạng `https://xemchua.xxx.ts.net`. Mở https://xemchua.pages.dev → **Cài đặt → Máy chủ xemchua** → dán địa chỉ đó → **Lưu và thử**.\n\n**Hai điều nên biết trước:**\n- IP máy chủ thuê hay bị YouTube nghi là bot. Nếu video báo lỗi *\"not a bot\"*, bạn xuất cookie từ một tài khoản Google phụ rồi chép lên máy Oracle. Các bước có trong file hướng dẫn.\n- Oracle có thể thu hồi máy miễn phí nếu nó gần như không chạy gì trong 7 ngày. Dùng thường xuyên thì không sao.\n\n**Những file mình đã đổi:**\n- `vitube_PWA/docker-compose.yml`: trước đây không truyền `VITUBE_ALLOW_ORIGINS` vào server. Thiếu nó thì trang xemchua bị chặn khi gọi sang server, nên mình đã thêm vào.\n- `vitube_PWA/.env.example`: đặt sẵn dòng cho phép `https://xemchua.pages.dev`.\n- Thêm script `vitube_PWA/oracle-setup.sh` và file `docs/ORACLE-FREE.md`.\n\nLệnh `curl` ở bước 4 tải script từ nhánh `main`, nên bạn cần đưa bản nháp lên `main` trước khi chạy. Kẹt ở bước nào thì chụp màn hình gửi mình.",
+        "by": "Claude Code · claude-opus-5-5",
+        "at": "2026-10-28T04:07:21.373Z"
+      },
+      {
+        "role": "tool",
+        "text": "💾 Đã lưu 5 file vào bản nháp: README.md, docs/ORACLE-FREE.md, vitube_PWA/.env.example, vitube_PWA/docker-compose.yml, vitube_PWA/oracle-setup.sh"
       }
     ],
-    "updatedAt": "2026-10-28T04:07:08.058Z",
+    "updatedAt": "2026-10-28T04:07:27.900Z",
     "homeSession": "c4c042f3-c78f-4a7e-85e6-17f79f9179ac",
     "claudeTask": null,
     "geminiSession": "26f99de3-194a-44de-97bf-236b70a078fd",
