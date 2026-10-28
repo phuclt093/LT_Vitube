@@ -598,9 +598,19 @@
       {
         "role": "tool",
         "text": "$ mkdir -p ~/.config/systemd/user && cat > ~/.config/systemd/user/xemchua.service <<'EOF'\n[Unit]\nDescription=xemchua serve"
+      },
+      {
+        "role": "assistant",
+        "text": "Node nằm trong nvm, systemd không thấy — sửa đường dẫn tuyệt đối.",
+        "by": "Claude Code · claude-opus-5-5",
+        "at": "2026-10-28T06:53:45.028Z"
+      },
+      {
+        "role": "tool",
+        "text": "$ sed -i \"s|^ExecStart=/usr/bin/env node |ExecStart=~/.nvm/versions/node/v22.23.2/bin/node |\" ~/.config/systemd/user/xemch"
       }
     ],
-    "updatedAt": "2026-10-28T06:53:36.943Z",
+    "updatedAt": "2026-10-28T06:53:48.178Z",
     "homeSession": "c4c042f3-c78f-4a7e-85e6-17f79f9179ac",
     "claudeTask": null,
     "geminiSession": "26f99de3-194a-44de-97bf-236b70a078fd",
