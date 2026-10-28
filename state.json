@@ -21,10 +21,6 @@
     },
     "chat": [
       {
-        "role": "tool",
-        "text": "✗ git push: To https://github.com/phuclt093/LT_Vitube.git  ! [remote rejected] HEAD -> titor/wip/main (refusing to allow an OAuth App to create or update workflow `.github/workflows/cloudflare-pages.yml` without `workflow` scope) error: failed to push some refs to 'https://github.com/phuclt093/LT_Vitube.git'"
-      },
-      {
         "role": "user",
         "text": "mình bấm không đc bạn",
         "images": [],
@@ -998,9 +994,13 @@
       {
         "role": "tool",
         "text": "💾 Đã lưu 13 file vào bản nháp: README.md, docs/GOOGLE-LOGIN.md, vitube-web/package-lock.json, vitube-web/package.json, vitube-web/src/app/api/auth/config/route.ts, vitube-web/src/app/api/auth/google/route.ts…"
+      },
+      {
+        "role": "tool",
+        "text": "🗜 Đã thu gọn phiên: 117k → 15k token — AI vẫn nhớ việc đang làm."
       }
     ],
-    "updatedAt": "2026-10-28T08:51:49.692Z",
+    "updatedAt": "2026-10-28T08:52:58.801Z",
     "homeSession": "c4c042f3-c78f-4a7e-85e6-17f79f9179ac",
     "claudeTask": null,
     "geminiSession": "26f99de3-194a-44de-97bf-236b70a078fd",
