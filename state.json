@@ -22,14 +22,6 @@
     "chat": [
       {
         "role": "tool",
-        "text": "📄 Read /tmp/xc-mask.png"
-      },
-      {
-        "role": "tool",
-        "text": "$ cat > vitube-desktop/build/icon.svg <<'EOF'\n<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 24 24\" width=\"1024\" hei"
-      },
-      {
-        "role": "tool",
         "text": "$ cd vitube-desktop && grep -rn \"icon-small\\|icon.svg\\|icon.ico\" --include=*.{mjs,js,json,cjs} . 2>/dev/null | grep -v nod"
       },
       {
@@ -1007,9 +999,19 @@
       {
         "role": "tool",
         "text": "$ rsync -a src/ ~/xemchua-server/src/ && cd ~/xemchua-server && npm run build >/tmp/xc-build.log 2>&1; echo build=$?; tail"
+      },
+      {
+        "role": "assistant",
+        "text": "Mình đã bỏ ô nhập mật khẩu. Giờ khung **Đăng nhập** chỉ còn hai cách:\n- nút **Tiếp tục với Google**\n- nút **Quét mã QR bằng điện thoại**\n\nServer ở máy nhà đã build lại và đang chạy bản mới. Kiểm tra kiểu và build đều qua, nhưng mình chưa mở khung đăng nhập để xem tận mắt.\n\n- **Tài khoản cũ:** nếu đã đăng ký bằng đúng Gmail đó, bấm Google là vào lại tài khoản cũ, lịch sử còn nguyên. Tài khoản đăng ký bằng email không phải Gmail thì không vào lại được nữa, vì đã hết ô mật khẩu.\n- **Khi server chưa có Client ID của Google** (ví dụ app desktop chạy server riêng): khung sẽ tự hiện lại ô email và mật khẩu như cũ. Mình giữ vậy để không bao giờ bị khoá ngoài.\n- **App Android TV:** phía server vẫn giữ chức năng đăng nhập bằng mật khẩu, nên app TV vẫn đăng nhập được như cũ.\n\nĐể xemchua.pages.dev cũng mất ô mật khẩu, bạn merge `titor/wip/main` vào `main`. Nhớ thêm Gmail của bạn vào **Test users** trong Google Cloud, nếu không thì Google sẽ chặn khi đăng nhập.",
+        "by": "Claude Code · claude-opus-5-5",
+        "at": "2026-10-28T09:47:04.646Z"
+      },
+      {
+        "role": "tool",
+        "text": "💾 Đã lưu 1 file vào bản nháp: vitube-web/src/components/AuthMenu.tsx"
       }
     ],
-    "updatedAt": "2026-10-28T09:44:50.553Z",
+    "updatedAt": "2026-10-28T09:47:10.435Z",
     "homeSession": "c4c042f3-c78f-4a7e-85e6-17f79f9179ac",
     "claudeTask": null,
     "geminiSession": "26f99de3-194a-44de-97bf-236b70a078fd",
