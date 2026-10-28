@@ -405,9 +405,13 @@
       {
         "role": "tool",
         "text": "💾 Đã lưu 5 file vào bản nháp: README.md, docs/ORACLE-FREE.md, vitube_PWA/.env.example, vitube_PWA/docker-compose.yml, vitube_PWA/oracle-setup.sh"
+      },
+      {
+        "role": "tool",
+        "text": "🗜 Đã thu gọn phiên: 110k → 13k token — AI vẫn nhớ việc đang làm."
       }
     ],
-    "updatedAt": "2026-10-28T04:07:27.900Z",
+    "updatedAt": "2026-10-28T04:08:22.707Z",
     "homeSession": "c4c042f3-c78f-4a7e-85e6-17f79f9179ac",
     "claudeTask": null,
     "geminiSession": "26f99de3-194a-44de-97bf-236b70a078fd",
