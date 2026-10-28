@@ -182,9 +182,9 @@ export function explainYtdlpError(raw: string): string {
   */
   if (/\[biliintl\]/.test(t)) {
     if (/registered users|log ?in|sign ?in/.test(t))
-      return 'BILI_LOGIN Tập này chỉ xem được khi đã đăng nhập Bilibili. Cấu hình cookie một lần là xem được — không cần nhập mật khẩu vào vitube.';
+      return 'BILI_LOGIN Tập này chỉ xem được khi đã đăng nhập Bilibili. Cấu hình cookie một lần là xem được — không cần nhập mật khẩu vào xemchua.';
     if (/premium|vip|purchase|paid/.test(t))
-      return 'Tập này chỉ dành cho thành viên trả phí của Bilibili. vitube không mở khoá nội dung trả phí.';
+      return 'Tập này chỉ dành cho thành viên trả phí của Bilibili. xemchua không mở khoá nội dung trả phí.';
     if (/region|area|country|geo/.test(t))
       return 'Tập này bị Bilibili giới hạn theo khu vực, không xem được từ vị trí của bạn.';
     if (/timed out|timeout/.test(t))

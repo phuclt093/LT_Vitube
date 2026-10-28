@@ -14,8 +14,8 @@ export const dynamic = 'force-static';
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: withBase('/'),
-    name: 'vitube — xem video không quảng cáo',
-    short_name: 'vitube',
+    name: 'xemchua — xem video không quảng cáo',
+    short_name: 'xemchua',
     description: 'Trình xem YouTube và Bilibili tối giản, không quảng cáo.',
     lang: 'vi',
     start_url: withBase('/?source=pwa'),

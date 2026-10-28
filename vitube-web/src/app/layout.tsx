@@ -8,7 +8,7 @@ import { IS_STATIC, withBase } from '@/lib/base-path';
 import ServerBanner from '@/components/ServerBanner';
 
 export const metadata: Metadata = {
-  title: 'vitube — xem video không quảng cáo',
+  title: 'xemchua — xem video không quảng cáo',
   description: 'Trình xem YouTube tối giản, không quảng cáo.',
   manifest: withBase('/manifest.webmanifest'),
   /*
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     statusBarStyle 'default' (không phải 'black-translucent'): nội dung nằm DƯỚI thanh
     trạng thái, tự né tai thỏ — khỏi phải sửa từng thanh cố định theo safe-area.
   */
-  appleWebApp: { capable: true, title: 'vitube', statusBarStyle: 'default' },
+  appleWebApp: { capable: true, title: 'xemchua', statusBarStyle: 'default' },
   icons: {
     icon: [{ url: withBase('/icons/icon-192.png'), sizes: '192x192', type: 'image/png' }],
     apple: [{ url: withBase('/icons/apple-touch-icon.png'), sizes: '180x180' }],

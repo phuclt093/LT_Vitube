@@ -212,7 +212,7 @@ async function startServer() {
   serverProcess.stderr.on('data', (d) => process.stderr.write(`[server] ${d}`));
   serverProcess.on('exit', (code) => {
     if (code !== 0 && !app.isQuiting) {
-      dialog.showErrorBox('vitube', `Server dừng đột ngột (mã ${code}).`);
+      dialog.showErrorBox('xemchua', `Server dừng đột ngột (mã ${code}).`);
     }
   });
 
@@ -344,7 +344,7 @@ function buildJumpList(payload) {
       name,
       // Windows cắt bớt nếu quá dài, giữ 6 mục cho gọn mắt
       items: list.slice(0, 6).map((v) =>
-        task(v.title, v.channel || 'vitube', `/watch?v=${v.id}`)
+        task(v.title, v.channel || 'xemchua', `/watch?v=${v.id}`)
       ),
     });
   };
@@ -483,7 +483,7 @@ function createWindow() {
 function buildMenu() {
   const template = [
     {
-      label: 'vitube',
+      label: 'xemchua',
       submenu: [
         {
           label: 'Trang chủ',

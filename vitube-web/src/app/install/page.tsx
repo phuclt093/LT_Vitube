@@ -66,14 +66,14 @@ export default function InstallPage() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={withBase('/icons/icon-192.png')} alt="" className="h-16 w-16" />
         <div>
-          <h1 className="text-2xl font-bold">Cài vitube</h1>
+          <h1 className="text-2xl font-bold">Cài xemchua</h1>
           <p className="text-sm text-yt-sub">Xem video không quảng cáo, mở như một ứng dụng.</p>
         </div>
       </div>
 
       {standalone ? (
         <Card>
-          <p className="font-medium">Bạn đang dùng vitube dạng ứng dụng rồi 🎉</p>
+          <p className="font-medium">Bạn đang dùng xemchua dạng ứng dụng rồi 🎉</p>
           <Link href="/" className="mt-4 inline-block rounded-full bg-yt-text px-5 py-2.5 text-sm font-medium text-yt-bg">
             Về trang chủ
           </Link>
@@ -84,7 +84,7 @@ export default function InstallPage() {
             <Card tone="warn">
               <p className="font-medium">Địa chỉ này chưa có HTTPS</p>
               <p className="mt-1 text-sm">
-                Điện thoại chỉ cài được vitube dạng ứng dụng từ một địa chỉ <code>https://</code>. Mở bằng địa
+                Điện thoại chỉ cài được xemchua dạng ứng dụng từ một địa chỉ <code>https://</code>. Mở bằng địa
                 chỉ hiện tại thì chỉ tạo được dấu trang. Xem hướng dẫn dựng HTTPS trong thư mục{' '}
                 <code>vitube_PWA</code>.
               </p>
@@ -118,9 +118,9 @@ export default function InstallPage() {
                     <Steps
                       items={[
                         'Thoát ra màn hình chính, mở app Cài đặt (bánh răng ⚙️).',
-                        'Bấm dòng "Đã tải về hồ sơ" ngay dưới tên tài khoản Apple ở trên cùng. (Không thấy thì vào Cài đặt chung → VPN & Quản lý thiết bị → vitube.)',
+                        'Bấm dòng "Đã tải về hồ sơ" ngay dưới tên tài khoản Apple ở trên cùng. (Không thấy thì vào Cài đặt chung → VPN & Quản lý thiết bị → xemchua.)',
                         'Bấm Cài đặt ở góc trên phải → nhập mật mã → bấm Cài đặt lần nữa → Xong.',
-                        'Biểu tượng vitube xuất hiện trên màn hình chính.',
+                        'Biểu tượng xemchua xuất hiện trên màn hình chính.',
                       ]}
                     />
                     <p className="mt-3 text-xs text-yt-sub">
@@ -154,7 +154,7 @@ export default function InstallPage() {
                         'Bấm "Tải file cài đặt", rồi chọn Cho phép.',
                         'Mở app Cài đặt — ngay trên cùng có dòng "Đã tải về hồ sơ", bấm vào.',
                         'Bấm Cài đặt (góc trên phải), nhập mật mã máy, bấm Cài đặt thêm lần nữa.',
-                        'Xong — biểu tượng vitube nằm trên màn hình chính.',
+                        'Xong — biểu tượng xemchua nằm trên màn hình chính.',
                       ]}
                     />
                   </>
@@ -181,10 +181,10 @@ export default function InstallPage() {
           {platform === 'android' && (
             <Card>
               {done ? (
-                <p className="font-medium">Đã cài! Mở vitube từ màn hình chính hoặc danh sách ứng dụng.</p>
+                <p className="font-medium">Đã cài! Mở xemchua từ màn hình chính hoặc danh sách ứng dụng.</p>
               ) : canPrompt ? (
                 <button onClick={install} className="w-full rounded-full bg-yt-red px-5 py-3 font-medium text-white">
-                  Cài vitube
+                  Cài xemchua
                 </button>
               ) : (
                 <>
@@ -222,7 +222,7 @@ export default function InstallPage() {
               <p className="mt-2 break-all rounded-lg bg-yt-chip px-3 py-2 font-mono text-sm">{origin}/install</p>
               {canPrompt && (
                 <button onClick={install} className="mt-4 rounded-full bg-yt-chip px-5 py-2.5 text-sm font-medium">
-                  Cài vitube trên máy tính này
+                  Cài xemchua trên máy tính này
                 </button>
               )}
             </Card>

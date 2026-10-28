@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
-  <!-- bản cho cỡ nhỏ (≤32px): bỏ khung, nét dày hơn để không nhoè -->
-  <rect x="40" y="40" width="944" height="944" rx="190" fill="#a93a2e"/>
-  <path d="M420 300 L664 512 L420 724" fill="none" stroke="#faf7f0" stroke-width="128" stroke-linecap="round" stroke-linejoin="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1024" height="1024">
+  <!-- xemchua · bản cho cỡ nhỏ (≤32px): chỉ bong bóng son + mũi tên kem, khớp src/components/Logo.tsx -->
+  <path d="M7 2.5h10a5 5 0 0 1 5 5V13a5 5 0 0 1-5 5h-6.3l-4.1 3.2c-.66.5-1.6.04-1.6-.79V17.6A5 5 0 0 1 2 13V7.5a5 5 0 0 1 5-5Z" fill="#a93a2e"/>
+  <path d="M10.2 7 L14 10.25 L10.2 13.5" fill="none" stroke="#faf7f0" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

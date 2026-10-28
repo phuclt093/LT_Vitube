@@ -82,7 +82,7 @@ export default function PipDebugPage() {
       ctx.fillStyle = '#fff';
       ctx.font = 'bold 64px system-ui, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('vitube', c.width / 2, c.height / 2 - 10);
+      ctx.fillText('xemchua', c.width / 2, c.height / 2 - 10);
       ctx.font = '36px ui-monospace, monospace';
       ctx.fillText(new Date().toLocaleTimeString(), c.width / 2, c.height / 2 + 50);
       raf = requestAnimationFrame(draw);

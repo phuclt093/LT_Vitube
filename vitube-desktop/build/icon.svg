@@ -1,12 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
-  <!-- vitube · ấn triện son: khối son, khung mảnh như con dấu, mũi tên phát màu giấy -->
-  <defs>
-    <linearGradient id="son" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#b3443a"/>
-      <stop offset="1" stop-color="#9c3328"/>
-    </linearGradient>
-  </defs>
-  <rect x="72" y="72" width="880" height="880" rx="168" fill="url(#son)"/>
-  <rect x="140" y="140" width="744" height="744" rx="112" fill="none" stroke="#faf7f0" stroke-opacity=".55" stroke-width="16"/>
-  <path d="M432 330 L640 512 L432 694" fill="none" stroke="#faf7f0" stroke-width="96" stroke-linecap="round" stroke-linejoin="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1024" height="1024">
+  <!-- xemchua · bong bóng chat kem trên nền son, mũi tên phát màu son (khớp vitube_PWA/icons/make-icons.mjs) -->
+  <rect x="1.7" y="1.7" width="20.6" height="20.6" rx="4" fill="#a93a2e"/>
+  <g transform="translate(12 12.4) scale(0.64) translate(-12 -12)">
+    <path d="M7 2.5h10a5 5 0 0 1 5 5V13a5 5 0 0 1-5 5h-6.3l-4.1 3.2c-.66.5-1.6.04-1.6-.79V17.6A5 5 0 0 1 2 13V7.5a5 5 0 0 1 5-5Z" fill="#faf7f0"/>
+    <path d="M10.2 7 L14 10.25 L10.2 13.5" fill="none" stroke="#a93a2e" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
 </svg>

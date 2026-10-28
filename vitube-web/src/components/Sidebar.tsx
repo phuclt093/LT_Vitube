@@ -137,7 +137,7 @@ export default function Sidebar({ open, mini }: { open: boolean; mini: boolean }
         />
         <hr className="my-3 border-yt-border" />
         <p className="px-3 pb-3 pt-1 text-xs leading-5 text-yt-sub">
-          vitube · dự án cá nhân.
+          xemchua · dự án cá nhân.
           <br />
           Nội dung thuộc về YouTube và các chủ sở hữu.
         </p>

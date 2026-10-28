@@ -62,10 +62,10 @@ export default function SyncServer() {
     <div className="space-y-3 px-4 py-4">
       {IS_STATIC ? (
         <div>
-          <p className="text-sm font-medium">Máy chủ vitube</p>
+          <p className="text-sm font-medium">Máy chủ xemchua</p>
           <p className="mt-1 text-xs leading-5 text-yt-sub">
-            Đây là bản giao diện trên GitHub Pages — không có server riêng. Điền địa chỉ HTTPS
-            của một server vitube đang chạy (máy nhà qua Tailscale Funnel / Cloudflare Tunnel,
+            Đây là bản giao diện web (GitHub/Cloudflare Pages) — không có server riêng. Điền địa chỉ HTTPS
+            của một server xemchua đang chạy (máy nhà qua Tailscale Funnel / Cloudflare Tunnel,
             hoặc VPS). Mọi thứ — feed, tìm kiếm, video, tài khoản — sẽ lấy từ server đó. Server
             phải đặt <code>VITUBE_ALLOW_ORIGINS</code> chứa địa chỉ trang này.
           </p>
@@ -75,7 +75,7 @@ export default function SyncServer() {
         <p className="text-sm font-medium">Máy chủ đồng bộ</p>
         <p className="mt-1 text-xs leading-5 text-yt-sub">
           Bỏ trống thì tài khoản và thư viện nằm trên máy này. Điền địa chỉ một server
-          vitube thì mọi máy trỏ vào đó dùng chung dữ liệu — chỉ cần đăng nhập, không
+          xemchua thì mọi máy trỏ vào đó dùng chung dữ liệu — chỉ cần đăng nhập, không
           phải cấu hình database trên từng máy. Video vẫn do máy này tự lấy nên không
           tốn băng thông của server.
         </p>

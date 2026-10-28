@@ -82,15 +82,15 @@ export async function GET(req: NextRequest) {
 ${icon ? `      <key>Icon</key>\n      <data>${icon}</data>\n` : ''}      <key>IsRemovable</key>
       <true/>
       <key>Label</key>
-      <string>vitube</string>
+      <string>xemchua</string>
       <key>Precomposed</key>
       <true/>
       <key>URL</key>
       <string>${esc(origin)}/?source=webclip</string>
       <key>PayloadDescription</key>
-      <string>Biểu tượng vitube trên màn hình chính</string>
+      <string>Biểu tượng xemchua trên màn hình chính</string>
       <key>PayloadDisplayName</key>
-      <string>vitube</string>
+      <string>xemchua</string>
       <key>PayloadIdentifier</key>
       <string>app.vitube.webclip.${esc(id)}</string>
       <key>PayloadType</key>
@@ -102,13 +102,13 @@ ${icon ? `      <key>Icon</key>\n      <data>${icon}</data>\n` : ''}      <key>I
     </dict>
   </array>
   <key>PayloadDescription</key>
-  <string>Thêm vitube vào màn hình chính. Hồ sơ này chỉ chứa một biểu tượng trỏ tới ${esc(origin)} — không cài phần mềm, không đổi cài đặt nào khác của máy. Gỡ bất cứ lúc nào trong Cài đặt → Cài đặt chung → VPN &amp; Quản lý thiết bị.</string>
+  <string>Thêm xemchua vào màn hình chính. Hồ sơ này chỉ chứa một biểu tượng trỏ tới ${esc(origin)} — không cài phần mềm, không đổi cài đặt nào khác của máy. Gỡ bất cứ lúc nào trong Cài đặt → Cài đặt chung → VPN &amp; Quản lý thiết bị.</string>
   <key>PayloadDisplayName</key>
-  <string>vitube</string>
+  <string>xemchua</string>
   <key>PayloadIdentifier</key>
   <string>app.vitube.profile.${esc(id)}</string>
   <key>PayloadOrganization</key>
-  <string>vitube</string>
+  <string>xemchua</string>
   <key>PayloadRemovalDisallowed</key>
   <false/>
   <key>PayloadType</key>

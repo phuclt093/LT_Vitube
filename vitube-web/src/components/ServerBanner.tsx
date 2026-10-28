@@ -32,9 +32,9 @@ export default function ServerBanner() {
 
   return (
     <div className="fixed inset-x-0 bottom-4 z-[100] mx-auto w-[min(92vw,560px)] rounded-xl border border-yt-border bg-yt-bg2 p-4 text-sm shadow-lg">
-      <p className="font-medium">Chưa kết nối máy chủ vitube</p>
+      <p className="font-medium">Chưa kết nối máy chủ xemchua</p>
       <p className="mt-1 text-xs leading-5 text-yt-sub">
-        Bản trên GitHub Pages chỉ có giao diện. Video, feed và tìm kiếm cần một server vitube
+        Bản web chỉ có giao diện. Video, feed và tìm kiếm cần một server xemchua
         đang chạy (máy nhà qua Tailscale Funnel / Cloudflare Tunnel, hoặc VPS).
       </p>
       <Link
