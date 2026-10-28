@@ -17,6 +17,8 @@ services:
       YT_LANG: vi
       YT_REGION: VN
       VITUBE_PUBLIC_URL: ${VITUBE_PUBLIC_URL:-}
+      # Trang giao diện ở chỗ khác (Cloudflare/GitHub Pages) được gọi sang server này
+      VITUBE_ALLOW_ORIGINS: ${VITUBE_ALLOW_ORIGINS:-}
       YTDLP_ARGS: ${YTDLP_ARGS:-}
       YTDLP_COOKIES_FILE: ${YTDLP_COOKIES_FILE:-}
       TWA_SHA256: ${TWA_SHA256:-}

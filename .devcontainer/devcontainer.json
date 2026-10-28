@@ -1,0 +1,22 @@
+// Chạy tạm server xemchua trong GitHub Codespaces (miễn phí ~60 giờ/tháng).
+// Hướng dẫn: docs/CODESPACES.md
+{
+  "name": "xemchua-server",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
+  "features": {
+    "ghcr.io/devcontainers/features/python:1": {}
+  },
+  "containerEnv": {
+    "YT_LANG": "vi",
+    "YT_REGION": "VN",
+    "VITUBE_ALLOW_ORIGINS": "https://xemchua.pages.dev,https://phuclt093.github.io"
+  },
+  // Lần đầu: cài thư viện, tải yt-dlp, build (5–10 phút)
+  "postCreateCommand": "cd vitube-web && npm ci --no-audit --no-fund && npm run setup:ytdlp && npm run build",
+  // Mỗi lần mở lại codespace: tự chạy server ở cổng 3000
+  "postStartCommand": "cd vitube-web && nohup npm start > /tmp/xemchua.log 2>&1 &",
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": { "label": "xemchua server", "onAutoForward": "notify" }
+  }
+}
