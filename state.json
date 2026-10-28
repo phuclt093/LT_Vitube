@@ -554,9 +554,16 @@
         "text": "Đúng rồi bro. Cần **một máy chạy liên tục** để giữ server, mà server thì gọi yt-dlp mỗi khi bạn mở video.\n\nLuồng hoạt động thế này:\n\n```\nBạn mở xemchua.pages.dev  (giao diện — Cloudflare lo, miễn phí)\n        │  bấm xem video\n        ▼\nMáy server  ──chạy yt-dlp──►  YouTube trả link video\n        │\n        ▼\nVideo phát trên trình duyệt\n```\n\nCloudflare chỉ lo phần **giao diện**. Phần **máy server** bạn phải chọn một trong mấy nơi sau:\n\n| Máy server | Giá | Chạy khi nào |\n|---|---|---|\n| Máy nhà bạn | Miễn phí | Khi máy bật |\n| GitHub Codespaces | Miễn phí ~60 giờ/tháng | Khi bạn mở codespace |\n| Oracle Cloud Free | Miễn phí | 24/7 (đăng ký khó) |\n| Cloudflare Containers | ~5 USD/tháng | 24/7 |\n| VPS thuê (Vultr, Contabo…) | ~4–5 USD/tháng | 24/7 |\n\nNếu chỉ một mình bạn xem thì **máy nhà** là đơn giản nhất. Máy này đã có sẵn Tailscale, nên mình cài server và mở địa chỉ HTTPS trong vài phút, chỉ có điều tắt máy là không xem được. Bạn chọn cách nào thì mình làm cách đó.",
         "by": "Claude Code · claude-opus-5-5",
         "at": "2026-10-28T06:30:20.674Z"
+      },
+      {
+        "role": "user",
+        "text": "vậy chọn cái máy linux mint đang làm server titor này đc ko",
+        "images": [],
+        "by": "phuclt093 · Linux · Chrome",
+        "at": "2026-10-28T06:31:15.521Z"
       }
     ],
-    "updatedAt": "2026-10-28T06:30:21.946Z",
+    "updatedAt": "2026-10-28T06:31:19.571Z",
     "homeSession": "c4c042f3-c78f-4a7e-85e6-17f79f9179ac",
     "claudeTask": null,
     "geminiSession": "26f99de3-194a-44de-97bf-236b70a078fd",
