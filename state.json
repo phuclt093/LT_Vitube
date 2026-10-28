@@ -965,9 +965,15 @@
         "images": [],
         "by": "phuclt093 · Linux · Chrome",
         "at": "2026-10-28T08:24:46.867Z"
+      },
+      {
+        "role": "assistant",
+        "text": "Có. Code gửi mail qua SMTP, kiểu kết nối gửi thư mà dịch vụ nào cũng hỗ trợ. Muốn đổi dịch vụ, bạn chỉ cần sửa `~/xemchua-server/.env.local` rồi khởi động lại, không phải sửa code.\n\n| Dịch vụ | Miễn phí | Cần tên miền riêng? | Ghi chú |\n|---|---|---|---|\n| **Brevo** (mình khuyên dùng) | 300 mail/ngày | Không, chỉ cần xác minh một địa chỉ gửi | Đăng ký ở brevo.com, tạo SMTP key |\n| **Resend** | 100 mail/ngày | Có. Không có tên miền thì chỉ gửi được tới chính email đăng ký Resend | Hợp nếu sau này bạn mua tên miền |\n| **Mailjet** | 200 mail/ngày | Không | Giống Brevo |\n\n**Dùng Brevo:**\n1. Đăng ký ở https://brevo.com, rồi xác minh địa chỉ gửi trong mục **Senders**.\n2. Vào **SMTP & API**, tạo SMTP key.\n3. Sửa `.env.local`:\n   ```\n   SMTP_HOST=smtp-relay.brevo.com\n   SMTP_PORT=587\n   SMTP_USER=<SMTP login Brevo cho, dạng xxx@smtp-brevo.com>\n   SMTP_PASS=<SMTP key>\n   MAIL_FROM=xemchua <địa-chỉ-đã-xác-minh>\n   ```\n4. Chạy `systemctl --user restart xemchua`.\n\nKhông có tên miền riêng thì mail dễ rơi vào mục Spam, dịch vụ nào cũng vậy. Bạn nên nhắc người dùng xem cả mục Spam (khung quên mật khẩu đã có dòng nhắc này). Nếu sau này mua tên miền (khoảng 10$/năm, quản lý luôn trên Cloudflare), bạn khai báo tên miền đó với dịch vụ gửi mail thì mail sẽ vào hộp thư chính.\n\nĐiền xong thì báo mình để mình thử gửi một mail.",
+        "by": "Claude Code · claude-opus-5-5",
+        "at": "2026-10-28T08:25:04.153Z"
       }
     ],
-    "updatedAt": "2026-10-28T08:24:50.721Z",
+    "updatedAt": "2026-10-28T08:25:05.717Z",
     "homeSession": "c4c042f3-c78f-4a7e-85e6-17f79f9179ac",
     "claudeTask": null,
     "geminiSession": "26f99de3-194a-44de-97bf-236b70a078fd",
