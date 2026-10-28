@@ -22,16 +22,6 @@
     "chat": [
       {
         "role": "tool",
-        "text": "$ git status --short; git log --oneline -3; git branch -a; git log origin/main --oneline -3 2>/dev/null"
-      },
-      {
-        "role": "assistant",
-        "text": "Bạn không thấy là đúng rồi. Workflow Cloudflare mình tạo mới chỉ nằm trên nhánh nháp `titor/wip/main`, còn GitHub chỉ hiện workflow trong tab Actions khi file đó đã có trên nhánh chính `main`.\n\n**Cách đưa lên `main`:**\n- **Trong Titor:** bấm nút đưa bản nháp vào `main` (merge hoặc publish).\n- **Hoặc trên GitHub:** vào **Pull requests → New pull request**, chọn `base: main` ← `compare: titor/wip/main`, rồi bấm **Create pull request** và **Merge**.\n\nSau khi merge:\n1. Nhớ thêm 2 secret `CLOUDFLARE_ACCOUNT_ID` và `CLOUDFLARE_API_TOKEN` trước, như hướng dẫn lần trước.\n2. Ở cột trái tab **Actions** sẽ hiện thêm **Deploy Cloudflare Pages**. Merge xong là nó tự chạy luôn.\n3. Nếu lúc đó chưa có secret thì lượt chạy đầu chỉ bỏ qua và cảnh báo. Thêm secret xong thì chọn **Deploy Cloudflare Pages → Run workflow** để chạy lại.\n\nLượt *Deploy GitHub Pages* đang chạy trong ảnh là workflow cũ, không ảnh hưởng gì đến cái mới.",
-        "by": "Claude Code · claude-opus-5-5",
-        "at": "2026-10-28T02:24:35.707Z"
-      },
-      {
-        "role": "tool",
         "text": "✗ git push: To https://github.com/phuclt093/LT_Vitube.git  ! [remote rejected] HEAD -> titor/wip/main (refusing to allow an OAuth App to create or update workflow `.github/workflows/cloudflare-pages.yml` without `workflow` scope) error: failed to push some refs to 'https://github.com/phuclt093/LT_Vitube.git'"
       },
       {
@@ -998,9 +988,19 @@
       {
         "role": "tool",
         "text": "✏️ Edit README.md"
+      },
+      {
+        "role": "assistant",
+        "text": "Đã làm xong đăng nhập bằng Google và quét QR, server trên máy nhà đã chạy bản mới. Đăng nhập QR mình đã thử trọn luồng và chạy đúng. Nút Google thì chưa thử với tài khoản Google thật được, vì còn chờ bạn tạo Client ID. Hướng dẫn chi tiết ở dưới, mình cũng ghi lại vào `docs/GOOGLE-LOGIN.md`.\n\n## Có gì mới trong khung Đăng nhập\n- Nút **\"Tiếp tục với Google\"**: chọn Gmail là vào. Tài khoản cũ đăng ký bằng đúng Gmail đó sẽ tự gộp vào, giữ nguyên lịch sử.\n- Nút **\"Quét mã QR bằng điện thoại\"**: máy hiện một mã QR. Bạn dùng điện thoại đã đăng nhập xemchua, quét bằng camera, rồi bấm **Cho phép**. Mã hết hạn sau 2 phút và chỉ dùng được một lần.\n- Dòng \"Quên mật khẩu?\" tự ẩn khi server chưa cài gửi mail.\n\n**Đã thử luồng QR bằng một tài khoản thử (đã xoá):**\n- Điện thoại chưa đăng nhập thì không duyệt được.\n- Biết mã trong QR cũng không lấy được phiên đăng nhập.\n- Sau khi duyệt, máy kia vào được, và mã không dùng lại được.\n\n## Việc bạn cần làm: tạo Client ID của Google (khoảng 5 phút)\n\n**Bước 1. Tạo project**\n1. Vào https://console.cloud.google.com và đăng nhập Gmail của bạn.\n2. Bấm ô chọn project trên thanh trên cùng → **New project** → đặt tên `xemchua` → **Create**.\n3. Đợi tạo xong rồi **chọn đúng project `xemchua`**.\n\n**Bước 2. Màn hình xin quyền**\n1. Menu ☰ → **APIs & Services** → **OAuth consent screen** (có thể hiện tên **Google Auth Platform**) → **Get started**.\n2. **App name:** `xemchua`. **User support email:** Gmail của bạn → Next.\n3. **Audience:** chọn **External** → Next.\n4. **Contact information:** Gmail của bạn → Next → tích đồng ý → **Create**.\n\n**Bước 3. Cho mọi Gmail đăng nhập được**\n\nVào mục **Audience** → **Publish app** → Confirm. xemchua chỉ xin tên và email, nên Google không cần duyệt. Nếu bỏ bước này, chỉ những Gmail bạn tự thêm vào danh sách thử nghiệm mới đăng nhập được.\n\n**Bước 4. Tạo Client ID**\n1. Vào mục **Clients** → **Create client**.\n2. **Application type:** Web application. **Name:** `xemchua web`.\n3. **Authorized JavaScript origins:** bấm Add URI và thêm từng dòng:\n   - `https://xemchua.pages.dev`\n   - `https://phuclt-vostro-3671.tail6d710b.ts.net:8443`\n   - `http://localhost:3000`\n4. **Authorized redirect URIs:** để trống.\n5. Bấm **Create** rồi chép **Client ID** (dạng `1234…apps.googleusercontent.com`). Client ID là thông tin công khai, bạn dán vào chat cho mình cũng được.\n\n**Bước 5. Điền vào server**\n```bash\nnano ~/xemchua-server/.env.local    # dòng cuối: GOOGLE_CLIENT_ID=<Client ID>\nsystemctl --user restart xemchua\n```\nNếu bạn dán Client ID vào chat, mình điền và khởi động lại giúp, rồi kiểm tra luôn.\n\n**Bước 6. Đưa giao diện mới lên xemchua.pages.dev**\n\nMerge `titor/wip/main` vào `main`.\n\n## Lưu ý\n- Google có thể mất từ 5 phút tới vài giờ mới nhận địa chỉ mới. Trong lúc đó nút Google báo `origin_mismatch` là bình thường.\n- Mở đúng `https://xemchua.pages.dev`, đừng có dấu `.` sau `dev`. Nếu mở nhầm, app sẽ hiện link để mở lại đúng địa chỉ.\n- **Nên làm thêm:** trên GitHub, vào repo → **Settings → Secrets and variables → Actions → Variables**, thêm biến `VITUBE_API_URL` = `https://phuclt-vostro-3671.tail6d710b.ts.net:8443`. Khi đó điện thoại hay máy mới mở xemchua.pages.dev là tự nối vào server máy nhà, không phải vào Cài đặt điền tay.\n- App Android TV (Kotlin) chưa có màn hình hiện QR. Hiện chỉ bản web và app desktop có. Nếu cần, mình làm tiếp cho TV.",
+        "by": "Claude Code · claude-opus-5-5",
+        "at": "2026-10-28T08:51:41.623Z"
+      },
+      {
+        "role": "tool",
+        "text": "💾 Đã lưu 13 file vào bản nháp: README.md, docs/GOOGLE-LOGIN.md, vitube-web/package-lock.json, vitube-web/package.json, vitube-web/src/app/api/auth/config/route.ts, vitube-web/src/app/api/auth/google/route.ts…"
       }
     ],
-    "updatedAt": "2026-10-28T08:51:24.359Z",
+    "updatedAt": "2026-10-28T08:51:49.692Z",
     "homeSession": "c4c042f3-c78f-4a7e-85e6-17f79f9179ac",
     "claudeTask": null,
     "geminiSession": "26f99de3-194a-44de-97bf-236b70a078fd",
