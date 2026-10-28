@@ -45,6 +45,9 @@ function allowed(origin: string): boolean {
   if (!list.length) return false;
   if (list.includes('*')) return true;
   if (list.includes(origin)) return true;
+  // `xemchua.pages.dev.` (dấu chấm cuối, tên miền tuyệt đối) vẫn là cùng một trang
+  const bare = origin.replace(/\.(:\d+)?$/, '$1');
+  if (bare !== origin && list.includes(bare)) return true;
   return list.includes('local') && LOCAL.test(origin);
 }
 
