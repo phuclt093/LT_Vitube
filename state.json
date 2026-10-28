@@ -21,10 +21,6 @@
     },
     "chat": [
       {
-        "role": "tool",
-        "text": "✗ Google đã ngừng cho tài khoản Google cá nhân (gói miễn phí) dùng Gemini qua Gemini CLI. Cách dùng tiếp: tạo **Gemini API key** miễn phí ở aistudio.google.com/apikey rồi dán vào ⚙ Cài đặt → Gemini → \"Dùng Gemini API key\"."
-      },
-      {
         "role": "user",
         "text": "alo",
         "images": []
@@ -1001,9 +997,16 @@
         "text": "Ý tưởng bỏ mật khẩu, đăng nhập bằng mã 6 số là hay, và **làm được miễn phí**. Chỉ phần \"nhận ra số điện thoại\" là không làm được.\n\n**Phần không làm được:** app (web lẫn Android/iOS) không đọc được số điện thoại của máy, vì hệ điều hành chặn. Cách duy nhất để chắc ai đó giữ một số điện thoại là gửi SMS mã OTP, mà SMS thì tốn tiền theo từng tin, còn vướng hơn cả gửi email.\n\n**Phần làm được, gần đúng ý bạn:** mã 6 số đổi mỗi 30 giây, giống Google Authenticator. Gọi là TOTP, là chuẩn mở, nên không cần tự viết app riêng.\n1. Lúc đăng ký, xemchua hiện một mã QR.\n2. Bạn quét QR bằng app xác thực có sẵn: **Google Authenticator**, **Microsoft Authenticator** hoặc **2FAS** (đều miễn phí).\n3. Khi đăng nhập, bạn nhập email và 6 số đang hiện trên điện thoại, không cần mật khẩu.\n\nNhư vậy là đúng ý \"đúng thiết bị thì mới vào được\": khoá bí mật chỉ nằm trong điện thoại đã quét QR, máy khác không tạo ra được mã. Cách này không cần SMS, không cần email, không cần tên miền, và vẫn chạy khi điện thoại không có mạng.\n\nCần thêm mấy thứ cho chắc chắn:\n- **Mã dự phòng:** khoảng 10 mã dùng một lần, hiện lúc đăng ký, để dùng khi mất điện thoại.\n- **Giới hạn số lần nhập sai**, vì 6 số đoán mò được nếu không chặn.\n- **Tài khoản cũ đang dùng mật khẩu:** đăng nhập lần cuối bằng mật khẩu, rồi bật mã 6 số trong Cài đặt.\n\nNgoài ra còn **passkey**: đăng nhập bằng vân tay hoặc Face ID, không phải gõ gì, và Google, Apple đều đang chuyển sang cách này. Nó tiện hơn, nhưng cài đặt hơi rắc rối khi trang ở `xemchua.pages.dev` còn server ở máy nhà. Mình đề xuất làm mã 6 số trước, passkey tính sau.\n\nBạn đồng ý thì mình bắt tay code phần mã 6 số và mã dự phòng.",
         "by": "Claude Code · claude-opus-5-5",
         "at": "2026-10-28T08:33:10.381Z"
+      },
+      {
+        "role": "user",
+        "text": "cái hạn chế của phương pháp này đang là nếu bạn thay đổi thiết bị thì làm sao nhận đc bạn hiểu không",
+        "images": [],
+        "by": "phuclt093 · Linux · Chrome",
+        "at": "2026-10-28T08:34:37.555Z"
       }
     ],
-    "updatedAt": "2026-10-28T08:33:11.633Z",
+    "updatedAt": "2026-10-28T08:34:41.520Z",
     "homeSession": "c4c042f3-c78f-4a7e-85e6-17f79f9179ac",
     "claudeTask": null,
     "geminiSession": "26f99de3-194a-44de-97bf-236b70a078fd",
