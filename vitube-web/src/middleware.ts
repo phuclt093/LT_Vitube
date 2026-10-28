@@ -83,6 +83,11 @@ export function middleware(req: NextRequest) {
     );
     // Nhớ kết quả kiểm tra trước một ngày, khỏi hỏi lại mỗi request
     res.headers.set('Access-Control-Max-Age', '86400');
+    // Máy trong cùng mạng Tailscale phân giải *.ts.net ra IP 100.x — Chrome coi là
+    // mạng nội bộ và đòi server đồng ý rõ ràng (Private Network Access)
+    if (req.headers.get('access-control-request-private-network') === 'true') {
+      res.headers.set('Access-Control-Allow-Private-Network', 'true');
+    }
     return cors(res, origin);
   }
 

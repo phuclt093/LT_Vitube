@@ -49,6 +49,7 @@ type Store = {
   findUserByEmailRow(email: string): Async<UserRow | undefined>;
   findUserById(id: number): Async<UserRow | undefined>;
   insertUser(email: string, name: string, passwordHash: string): Async<UserRow>;
+  updatePassword(userId: number, passwordHash: string): Async<void>;
   insertSession(token: string, userId: number, expiresAt: number): Async<void>;
   getSession(token: string): Async<SessionRow | undefined>;
   deleteSession(token: string): Async<void>;
@@ -68,7 +69,7 @@ type Store = {
 };
 
 const REQUIRED = [
-  'findUserByEmailRow', 'findUserById', 'insertUser',
+  'findUserByEmailRow', 'findUserById', 'insertUser', 'updatePassword',
   'insertSession', 'getSession', 'deleteSession', 'findUserBySession', 'pruneSessions',
   'libraryList', 'libraryUpsert', 'libraryRemove', 'libraryClear',
 ] as const;
@@ -166,6 +167,9 @@ const s = async () => (await ready()).store;
 export const findUserByEmailRow = async (e: string) => (await s()).findUserByEmailRow(e);
 export const findUserById = async (id: number) => (await s()).findUserById(id);
 export const insertUser = async (e: string, n: string, h: string) => (await s()).insertUser(e, n, h);
+export const updatePassword = async (u: number, h: string) => {
+  await (await s()).updatePassword(u, h);
+};
 
 export const insertSession = async (t: string, u: number, x: number) => {
   await (await s()).insertSession(t, u, x);

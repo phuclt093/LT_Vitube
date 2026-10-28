@@ -16,6 +16,8 @@ type Ctx = {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
+  /** Nhận người dùng mà server vừa đăng nhập sẵn (Google, quét QR) */
+  adopt: (user: User) => Promise<void>;
   logout: () => Promise<void>;
 };
 
@@ -24,6 +26,7 @@ const AuthCtx = createContext<Ctx>({
   loading: true,
   login: async () => {},
   register: async () => {},
+  adopt: async () => {},
   logout: async () => {},
 });
 
@@ -116,6 +119,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         const j = await post('/api/auth/register', { name, email, password });
         await apply(j.user, true);
       },
+      adopt: (u) => apply(u, true),
       logout: async () => {
         await post('/api/auth/logout');
         setUser(null);

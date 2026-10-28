@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from './AuthProvider';
+import { apiFetch } from '@/lib/api';
+import { BASE_PATH } from '@/lib/base-path';
+import { GoogleButton, QrLogin, useAuthConfig } from './AuthExtras';
 import { HistoryIcon, ClockIcon, LikeIcon, PlaylistIcon, CloseIcon } from './Icons';
 
 // Màu phẳng theo bảng cổ phong: son, ngọc, chàm, hổ phách — không gradient
@@ -109,7 +112,9 @@ export default function AuthMenu() {
 
 function AuthModal({ onClose }: { onClose: () => void }) {
   const { login, register } = useAuth();
-  const [mode, setMode] = useState<'login' | 'register'>('login');
+  const [mode, setMode] = useState<'login' | 'register' | 'forgot' | 'qr'>('login');
+  const cfg = useAuthConfig();
+  const [sent, setSent] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -121,6 +126,17 @@ function AuthModal({ onClose }: { onClose: () => void }) {
     setErr('');
     setBusy(true);
     try {
+      if (mode === 'forgot') {
+        const r = await apiFetch('/api/auth/forgot', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, base: BASE_PATH }),
+        });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(j.error ?? 'Có lỗi xảy ra');
+        setSent(true);
+        return;
+      }
       if (mode === 'login') await login(email, password);
       else await register(name, email, password);
       onClose();
@@ -146,16 +162,33 @@ function AuthModal({ onClose }: { onClose: () => void }) {
         <div className="mb-5 flex items-start justify-between">
           <div>
             <h2 className="text-xl font-bold">
-              {mode === 'login' ? 'Đăng nhập' : 'Tạo tài khoản'}
+              {mode === 'login' ? 'Đăng nhập' : mode === 'register' ? 'Tạo tài khoản' : mode === 'qr' ? 'Quét mã để đăng nhập' : 'Quên mật khẩu'}
             </h2>
             <p className="mt-1 text-xs text-yt-sub">
-              Để lịch sử và danh sách của bạn theo được sang thiết bị khác
+              {mode === 'forgot'
+                ? 'Nhập email đã đăng ký, xemchua gửi link đặt mật khẩu mới'
+                : 'Để lịch sử và danh sách của bạn theo được sang thiết bị khác'}
             </p>
           </div>
           <button onClick={onClose} className="rounded-full p-1 hover:bg-yt-hover" aria-label="Đóng">
             <CloseIcon className="h-5 w-5" />
           </button>
         </div>
+
+        {mode === 'qr' ? (
+          <QrLogin onDone={onClose} />
+        ) : (
+        <>
+        {mode !== 'forgot' && cfg?.google && (
+          <div className="mb-4 space-y-4">
+            <GoogleButton clientId={cfg.google} onDone={onClose} onError={setErr} />
+            <div className="flex items-center gap-3 text-xs text-yt-sub">
+              <hr className="flex-1 border-yt-border" />
+              hoặc dùng email
+              <hr className="flex-1 border-yt-border" />
+            </div>
+          </div>
+        )}
 
         <form onSubmit={submit} className="space-y-3">
           {mode === 'register' && (
@@ -177,6 +210,7 @@ function AuthModal({ onClose }: { onClose: () => void }) {
             autoComplete="email"
             required
           />
+          {mode !== 'forgot' && (
           <input
             className={field}
             type="password"
@@ -186,6 +220,27 @@ function AuthModal({ onClose }: { onClose: () => void }) {
             autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
             required
           />
+          )}
+
+          {mode === 'login' && cfg?.mail && (
+            <button
+              type="button"
+              onClick={() => {
+                setMode('forgot');
+                setErr('');
+                setSent(false);
+              }}
+              className="text-xs text-yt-blue hover:underline"
+            >
+              Quên mật khẩu?
+            </button>
+          )}
+
+          {sent && (
+            <p className="rounded-lg bg-yt-blue/15 px-3 py-2 text-sm text-yt-blue">
+              Nếu email này đã đăng ký, link đặt lại sẽ tới trong vài phút. Nhớ xem cả mục Spam.
+            </p>
+          )}
 
           {err && <p className="rounded-lg bg-yt-red/15 px-3 py-2 text-sm text-yt-red">{err}</p>}
 
@@ -194,15 +249,43 @@ function AuthModal({ onClose }: { onClose: () => void }) {
             disabled={busy}
             className="w-full rounded-full bg-yt-text py-2.5 text-sm font-medium text-yt-bg hover:bg-yt-text/90 disabled:opacity-60"
           >
-            {busy ? 'Đang xử lý…' : mode === 'login' ? 'Đăng nhập' : 'Đăng ký'}
+            {busy
+              ? 'Đang xử lý…'
+              : mode === 'login'
+                ? 'Đăng nhập'
+                : mode === 'register'
+                  ? 'Đăng ký'
+                  : sent
+                    ? 'Gửi lại'
+                    : 'Gửi link đặt lại'}
           </button>
         </form>
+        </>
+        )}
+
+        {mode !== 'qr' ? (
+          <button
+            onClick={() => {
+              setMode('qr');
+              setErr('');
+            }}
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-yt-border py-2.5 text-sm font-medium hover:bg-yt-hover"
+          >
+            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" aria-hidden>
+              <path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm11-2h2v3h3v2h-3v3h-2v-3h-3v-2h3v-3zm3 6h2v2h-2v-2z" />
+            </svg>
+            Quét mã QR bằng điện thoại
+          </button>
+        ) : (
+          err && <p className="mt-3 rounded-lg bg-yt-red/15 px-3 py-2 text-sm text-yt-red">{err}</p>
+        )}
 
         <p className="mt-4 text-center text-sm text-yt-sub">
-          {mode === 'login' ? 'Chưa có tài khoản?' : 'Đã có tài khoản?'}{' '}
+          {mode === 'login' ? 'Chưa có tài khoản?' : mode === 'register' ? 'Đã có tài khoản?' : mode === 'qr' ? 'Dùng cách khác?' : 'Nhớ ra rồi?'}{' '}
           <button
             onClick={() => {
               setMode(mode === 'login' ? 'register' : 'login');
+              setSent(false);
               setErr('');
             }}
             className="font-medium text-yt-blue hover:underline"

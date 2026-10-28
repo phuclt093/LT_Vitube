@@ -155,6 +155,12 @@ export async function insertUser(
   return { id: Number(r.rows[0].id), email: clean, name, passwordHash, createdAt: now };
 }
 
+/** Đổi mật khẩu và đá mọi phiên cũ ra — ai đang cầm phiên bị lộ cũng mất luôn */
+export async function updatePassword(userId: number, passwordHash: string) {
+  await q('UPDATE users SET password_hash = ? WHERE id = ?', [passwordHash, userId]);
+  await q('DELETE FROM sessions WHERE user_id = ?', [userId]);
+}
+
 /* ---------------- sessions ---------------- */
 
 export async function insertSession(token: string, userId: number, expiresAt: number) {

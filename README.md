@@ -11,6 +11,7 @@ Xem YouTube không quảng cáo, giao diện bám sát YouTube.
 | `docs/CLOUDFLARE-PAGES.md` | Đưa giao diện lên Cloudflare Pages — `https://xemchua.pages.dev` |
 | `docs/ORACLE-FREE.md` | Chạy server 24/7 trên Oracle Cloud miễn phí (`vitube_PWA/oracle-setup.sh`) |
 | `docs/CODESPACES.md` | Chạy tạm server trên GitHub Codespaces — không cần thẻ, không cần máy nhà |
+| `docs/GOOGLE-LOGIN.md` | Bật "Đăng nhập bằng Google" và đăng nhập máy khác bằng quét QR |
 | `docs/CONTEXT.md` | **Đọc file này trước** — kiến trúc, quyết định, những hướng đã thất bại, nhật ký tiến độ |
 
 ## Chạy trên GitHub Pages

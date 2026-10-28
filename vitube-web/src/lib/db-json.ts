@@ -100,6 +100,15 @@ export function insertUser(email: string, name: string, passwordHash: string): U
   return row;
 }
 
+/** Đổi mật khẩu và đá mọi phiên cũ ra — ai đang cầm phiên bị lộ cũng mất luôn */
+export function updatePassword(userId: number, passwordHash: string) {
+  const u = state.users.find((x) => x.id === userId);
+  if (!u) return;
+  u.passwordHash = passwordHash;
+  for (const [t, s] of Object.entries(state.sessions)) if (s.userId === userId) delete state.sessions[t];
+  save();
+}
+
 /* ---------------- sessions ---------------- */
 
 export function insertSession(token: string, userId: number, expiresAt: number) {

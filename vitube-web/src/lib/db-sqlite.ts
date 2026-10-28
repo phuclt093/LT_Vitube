@@ -136,6 +136,12 @@ export function insertUser(email: string, name: string, passwordHash: string): U
   return { id: Number(info.lastInsertRowid), email: clean, name, passwordHash, createdAt: now };
 }
 
+/** Đổi mật khẩu và đá mọi phiên cũ ra — ai đang cầm phiên bị lộ cũng mất luôn */
+export function updatePassword(userId: number, passwordHash: string) {
+  db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').run(passwordHash, userId);
+  db.prepare('DELETE FROM sessions WHERE user_id = ?').run(userId);
+}
+
 /* ---------------- sessions ---------------- */
 
 export function insertSession(token: string, userId: number, expiresAt: number) {
