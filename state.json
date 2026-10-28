@@ -436,9 +436,19 @@
       {
         "role": "tool",
         "text": "$ cd vitube-web; grep -n \"linux\\|platform\\|url\" scripts/get-ytdlp.mjs | head -15"
+      },
+      {
+        "role": "assistant",
+        "text": "Được, dùng **GitHub Codespaces**: một máy ảo GitHub cho mượn, không cần thẻ, không cần máy nhà. Mình đã thêm cấu hình sẵn, nhưng chưa thử tạo codespace thật nên lần đầu có thể phải chỉnh nhỏ.\n\n**Cách dùng** (chi tiết trong `docs/CODESPACES.md`):\n1. Vào repo trên GitHub → nút xanh **Code → Codespaces → Create codespace on main**.\n2. Đợi 5–10 phút. Nó tự cài thư viện, tải yt-dlp, build rồi chạy server ở cổng 3000.\n3. Mở tab **PORTS**, chuột phải vào cổng **3000** → **Port Visibility → Public**. Không đổi sang Public thì trang xemchua không gọi sang được.\n4. Chép địa chỉ dạng `https://...-3000.app.github.dev`, rồi vào https://xemchua.pages.dev → **Cài đặt → Máy chủ xemchua** → dán vào → **Lưu và thử**.\n\n**Hạn chế:**\n- Server chỉ chạy khi codespace đang mở. Bỏ không 30 phút là nó tự tắt; bạn tăng được lên tối đa 4 giờ trong cài đặt Codespaces. Lần sau mở lại codespace cũ thì server tự chạy lại.\n- Miễn phí khoảng 60 giờ mỗi tháng.\n- Vẫn có thể gặp lỗi *\"not a bot\"* như trên Oracle, cách gỡ bằng cookie giống trong `docs/ORACLE-FREE.md`.\n\nMình không dùng GitHub Actions vì GitHub cấm dùng Actions để chạy server, mỗi lần chạy cũng chỉ được tối đa 6 tiếng và địa chỉ đổi liên tục.\n\nFile mới là `.devcontainer/devcontainer.json` và `docs/CODESPACES.md`, README cũng đã có link. Codespace được tạo từ nhánh `main`, nên bạn cần đưa bản nháp lên `main` trước.",
+        "by": "Claude Code · claude-opus-5-5",
+        "at": "2026-10-28T04:19:07.908Z"
+      },
+      {
+        "role": "tool",
+        "text": "💾 Đã lưu 3 file vào bản nháp: .devcontainer/devcontainer.json, README.md, docs/CODESPACES.md"
       }
     ],
-    "updatedAt": "2026-10-28T04:19:00.216Z",
+    "updatedAt": "2026-10-28T04:19:13.728Z",
     "homeSession": "c4c042f3-c78f-4a7e-85e6-17f79f9179ac",
     "claudeTask": null,
     "geminiSession": "26f99de3-194a-44de-97bf-236b70a078fd",
