@@ -808,9 +808,13 @@
       {
         "role": "tool",
         "text": "$ U=$(curl -sS -m 60 https://phuclt-vostro-3671.tail6d710b.ts.net:8443/api/streams/0sfDth4lMLc | python3 -c 'import json,s"
+      },
+      {
+        "role": "tool",
+        "text": "$ cd vitube-web/src; cat lib/remote-shim.ts | head -80; grep -rn \"\\.hls\\b\\|isLive\\|liveWithoutHls\" --include=*.tsx . | hea"
       }
     ],
-    "updatedAt": "2026-10-28T07:38:28.928Z",
+    "updatedAt": "2026-10-28T07:38:43.046Z",
     "homeSession": "c4c042f3-c78f-4a7e-85e6-17f79f9179ac",
     "claudeTask": null,
     "geminiSession": "26f99de3-194a-44de-97bf-236b70a078fd",
