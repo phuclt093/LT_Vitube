@@ -175,21 +175,21 @@ function AuthModal({ onClose }: { onClose: () => void }) {
           </button>
         </div>
 
-        {mode === 'qr' ? (
+        {/*
+          Server có Google thì chỉ còn Google + QR, không còn ô mật khẩu.
+          Server chưa khai GOOGLE_CLIENT_ID (vd. app desktop chạy server riêng) thì giữ
+          form email/mật khẩu cũ — không thì chẳng còn đường nào để đăng nhập.
+        */}
+        {!cfg ? (
+          <div className="skeleton h-11 w-full rounded-full" />
+        ) : mode === 'qr' ? (
           <QrLogin onDone={onClose} />
-        ) : (
-        <>
-        {mode !== 'forgot' && cfg?.google && (
-          <div className="mb-4 space-y-4">
+        ) : cfg.google ? (
+          <div className="space-y-3">
             <GoogleButton clientId={cfg.google} onDone={onClose} onError={setErr} />
-            <div className="flex items-center gap-3 text-xs text-yt-sub">
-              <hr className="flex-1 border-yt-border" />
-              hoặc dùng email
-              <hr className="flex-1 border-yt-border" />
-            </div>
+            {err && <p className="rounded-lg bg-yt-red/15 px-3 py-2 text-sm text-yt-red">{err}</p>}
           </div>
-        )}
-
+        ) : (
         <form onSubmit={submit} className="space-y-3">
           {mode === 'register' && (
             <input
@@ -260,7 +260,6 @@ function AuthModal({ onClose }: { onClose: () => void }) {
                     : 'Gửi link đặt lại'}
           </button>
         </form>
-        </>
         )}
 
         {mode !== 'qr' ? (
@@ -280,6 +279,21 @@ function AuthModal({ onClose }: { onClose: () => void }) {
           err && <p className="mt-3 rounded-lg bg-yt-red/15 px-3 py-2 text-sm text-yt-red">{err}</p>
         )}
 
+        {cfg?.google ? (
+          mode === 'qr' && (
+            <p className="mt-4 text-center text-sm text-yt-sub">
+              <button
+                onClick={() => {
+                  setMode('login');
+                  setErr('');
+                }}
+                className="font-medium text-yt-blue hover:underline"
+              >
+                Đăng nhập bằng Google
+              </button>
+            </p>
+          )
+        ) : (
         <p className="mt-4 text-center text-sm text-yt-sub">
           {mode === 'login' ? 'Chưa có tài khoản?' : mode === 'register' ? 'Đã có tài khoản?' : mode === 'qr' ? 'Dùng cách khác?' : 'Nhớ ra rồi?'}{' '}
           <button
@@ -293,6 +307,7 @@ function AuthModal({ onClose }: { onClose: () => void }) {
             {mode === 'login' ? 'Đăng ký' : 'Đăng nhập'}
           </button>
         </p>
+        )}
       </div>
     </div>
   );
