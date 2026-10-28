@@ -327,9 +327,13 @@
         "text": "Mình đã đổi tên hiển thị sang **xemchua** và làm logo mới. Kiểm tra kiểu (typecheck) và build bản tĩnh đều chạy được. Mình đã xem ảnh icon xuất ra, nhưng chưa mở trang trong trình duyệt nên chưa thấy logo nằm trên thanh trên trông thế nào.\n\n**Logo mới**\n- Ý tưởng là câu \"xem chưa?\" kiểu rủ nhau trong tin nhắn: một bong bóng chat màu son (đỏ trầm), bên trong có mũi tên phát. Mình vẫn dùng màu son và kem cũ cho khớp giao diện.\n- Trên thanh trên, chữ hiện là **xem** màu chữ thường, **chưa** màu son. Mình bỏ chữ \"VN\" nhỏ bên cạnh. Rê chuột vào logo thì bong bóng hơi nghiêng.\n- Icon ứng dụng là nền son bo góc, giữa là bong bóng màu kem. Mình đã tạo lại cho tab trình duyệt, cài trên điện thoại (Android, iPhone), app Android và app desktop.\n\n**Những chỗ đã đổi chữ \"vitube\" → \"xemchua\"**\n- Tiêu đề tab, tên khi cài lên điện thoại, chân thanh bên, trang Cài đặt, thông báo \"Chưa kết nối máy chủ\", trang Cài đặt app (`/install`), trang mất kết nối, hồ sơ cài trên iPhone, và vài thông báo lỗi Bilibili.\n- App desktop: tên menu, hộp báo lỗi và danh sách mở nhanh.\n\n**Những chỗ mình cố ý để nguyên**\n- Tên nội bộ trong code, biến môi trường `VITUBE_*` và tên thư mục.\n- Khoá lưu dữ liệu trên máy (`vitube.*`). Đổi khoá này thì lịch sử, danh sách phát và cài đặt đang lưu sẽ mất.\n- `productName` của app desktop. Đổi nó thì app chuyển sang thư mục dữ liệu mới, mất dữ liệu cũ.\n- App Android TV và tên gói `app.vitube...`. Đổi tên gói thì máy coi là app khác và không cập nhật đè lên app cũ được.\n\nKhi bản nháp được đưa lên `main`, trang https://xemchua.pages.dev sẽ tự cập nhật. App desktop thì phải đóng gói lại mới có icon mới.",
         "by": "Claude Code · claude-opus-5-5",
         "at": "2026-10-28T03:10:48.993Z"
+      },
+      {
+        "role": "tool",
+        "text": "💾 Đã lưu 40 file vào bản nháp: vitube-desktop/assets/icon.png, vitube-desktop/build/icon-small.svg, vitube-desktop/build/icon.ico, vitube-desktop/build/icon.png, vitube-desktop/build/icon.svg, vitube-desktop/build/icons/1024x1024.png…"
       }
     ],
-    "updatedAt": "2026-10-28T03:10:52.007Z",
+    "updatedAt": "2026-10-28T03:11:18.820Z",
     "homeSession": "c4c042f3-c78f-4a7e-85e6-17f79f9179ac",
     "claudeTask": null,
     "geminiSession": "26f99de3-194a-44de-97bf-236b70a078fd",
